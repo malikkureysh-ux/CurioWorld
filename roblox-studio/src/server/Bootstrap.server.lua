@@ -61,11 +61,13 @@ end
 local TelemetryService = require(ServerScriptService.Services.TelemetryService)
 local SaveService       = require(ServerScriptService.Services.SaveService)
 local EconomyService    = require(ServerScriptService.Services.EconomyService)
+local QuestService      = require(ServerScriptService.Services.QuestService)
 local QuestVisibilityService = require(ServerScriptService.Services.QuestVisibilityService)
 
 ServiceRegistry:Register("Telemetry", TelemetryService)
 ServiceRegistry:Register("Save", SaveService)
 ServiceRegistry:Register("Economy", EconomyService)
+ServiceRegistry:Register("Quest", QuestService)
 ServiceRegistry:Register("QuestVisibility", QuestVisibilityService)
 
 -- ============================================================
@@ -79,6 +81,9 @@ if harborContainer then
 	for _ in pairs(spawnedNpcs) do count += 1 end
 	Log:Info(("NPCs gespawnt: %d"):format(count))
 end
+
+-- QuestService: auto-evaluate WorldServices alle 2s
+QuestService:Init()
 
 -- QuestVisibility: scan Map für Attribute (VisibleAfterQuest, QuestHook, MaterialType)
 QuestVisibilityService:Init()

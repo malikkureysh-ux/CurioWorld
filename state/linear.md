@@ -507,13 +507,23 @@
 - [x] Boat_Built visibility toggle via VisibleAfterQuest ✅
 - [x] QuestVisibilityService.lua — Map-Attribute lebendig ✅
 - [x] MaterialStorage pickup (Logging, Phase 3 Inventory) ✅
-- [ ] Sound-Effekt beim Kauf (M20) ⏸ (Sound-Asset fehlt)
-- [ ] Typewriter-Effekt im M18 Dialog ⏸
-- [ ] Smooth slide-in animations on M19/M20 (M18 already done) ⏸
-- [ ] Workbench quest hook consumer (Phase 3) ⏸
-- [ ] QuestBoards refresh logic (Phase 3) ⏸
-- [ ] Island_Base mesh replacement (Phase 3) ⏸
-- [ ] Boat_Row Animation caller (Phase 3) ⏸
+
+### Wave 7 — Quest-Service + UX-Polish ✅ DONE (2026-06-27 21:35)
+- [x] M18 Dialogue: Typewriter-Effekt (30 chars/sec) ✅
+- [x] M19 QuestTracker: Slide-In-Animation von rechts ✅
+- [x] M20 Shop: Scale-In Modal + Kauf-Sound-Trigger ✅
+- [x] M20 Shop: Erfolgs-Feedback (UIScale-Pulse + Green-Flash) ✅
+- [x] QuestService.lua — Bridge M02 ↔ WorldServices ✅
+- [x] M16 NpcSpawner: MarkNpcTalked → QuestService ✅
+- [x] End-to-End Quest-Loop funktioniert (NPC → Dialogue → Talk → Step Advance)
+
+### Verbleibend (deferred)
+- [ ] Phase-3 Module runtime: M03/M06/M09/M10/M11 (Type-Aliase existieren)
+- [ ] AES-256-GCM via KMS (aktuell: XOR-Cipher)
+- [ ] Asset-Upload (13 FBX + 6 Sounds + 4 Animations)
+- [ ] Workbench quest hook consumer
+- [ ] QuestBoards refresh logic
+- [ ] Island_Base mesh replacement
 
 ---
 

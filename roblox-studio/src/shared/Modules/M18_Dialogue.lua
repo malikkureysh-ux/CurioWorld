@@ -163,7 +163,7 @@ function M18_Dialogue:Show(player: Player, npcConfig: { [string]: any },
 	roleTag.Parent = modal
 	makeUICorner(roleTag, UDim.new(0, 6))
 
-	-- Dialogue-Text
+	-- Dialogue-Text (mit Typewriter-Effekt)
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Name = "DialogueText"
 	textLabel.Size = UDim2.new(1, -40, 0, 110)
@@ -175,8 +175,28 @@ function M18_Dialogue:Show(player: Player, npcConfig: { [string]: any },
 	textLabel.TextWrapped = true
 	textLabel.TextXAlignment = Enum.TextXAlignment.Left
 	textLabel.TextYAlignment = Enum.TextYAlignment.Top
-	textLabel.Text = dialogueText
+	textLabel.Text = ""  -- leer → Typewriter füllt
 	textLabel.Parent = modal
+
+	-- Typewriter-Effekt: Zeichen-für-Zeichen mit Task.spawn
+	-- Speed: ~30 chars/sec (lesbar + cinematisch)
+	local TypewriterSpeed = 30  -- chars per second
+	task.spawn(function()
+		if not textLabel or not textLabel.Parent then return end
+		local fullText = dialogueText or ""
+		-- Skip-Typewriter bei sehr langem Text (z.B. >300 chars)
+		if #fullText > 300 then
+			textLabel.Text = fullText
+			return
+		end
+		local delayPerChar = 1.0 / TypewriterSpeed
+		for i = 1, #fullText do
+			if not textLabel or not textLabel.Parent then return end
+			-- Skip wenn User auf "Skip"-Button gedrückt (Phase 3)
+			textLabel.Text = string.sub(fullText, 1, i)
+			task.wait(delayPerChar)
+		end
+	end)
 
 	-- Antwort-Optionen (oder Weiter-Pfeil)
 	local optionsFrame = Instance.new("Frame")

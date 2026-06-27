@@ -30,6 +30,10 @@ local M20_Shop = {}
 -- Signature: (player: Player, itemId: string, item: any) -> (ok: boolean, err: string?)
 M20_Shop.PurchaseHandler = nil
 
+-- Optional Sound-Controller (set by client-side Bootstrap)
+-- Wenn gesetzt: Kauf triggert SoundController:PlaySfx
+M20_Shop.SoundController = nil
+
 M20_Shop.Theme = {
 	BackgroundColor = Color3.fromRGB(25, 28, 35),
 	ItemIdle = Color3.fromRGB(50, 55, 70),
@@ -196,12 +200,38 @@ local function makeItemCard(parent, item, playerGold, playerIsVip, player)
 		clickBtn.Parent = card
 
 		clickBtn.MouseButton1Click:Connect(function()
-			-- Audio-Buy-Sound (TODO Phase 3: eigener Sound)
+			-- Audio-Buy-Sound (SoundController.PlaySfx — graceful wenn Sound fehlt)
+			if M20_Shop.SoundController and M20_Shop.SoundController.PlaySfx then
+				pcall(M20_Shop.SoundController.PlaySfx, M20_Shop.SoundController, "Quest_Abschluss")
+			end
 
 			-- Optional Callback (server-side gate)
 			if M20_Shop.PurchaseHandler then
 				local ok, err = M20_Shop.PurchaseHandler(player, item.id, item)
-				if not ok then
+				if ok then
+					-- Erfolgs-Feedback: kurzes Golden-Flash + Scale-Pulse
+					local old = card.BackgroundColor3
+					TweenService:Create(card,
+						TweenInfo.new(0.15, Enum.EasingStyle.Quad),
+						{ BackgroundColor3 = Color3.fromRGB(120, 255, 140) }):Play()
+					-- Scale-Pulse via UIScale
+					local pulse = card:FindFirstChildOfClass("UIScale")
+					if not pulse then
+						pulse = Instance.new("UIScale")
+						pulse.Parent = card
+					end
+					pulse.Scale = 1
+					TweenService:Create(pulse,
+						TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+						{ Scale = 1.08 }):Play()
+					task.delay(0.3, function()
+						if card.Parent then
+							TweenService:Create(pulse,
+								TweenInfo.new(0.3, Enum.EasingStyle.Quad),
+								{ Scale = 1.0 }):Play()
+						end
+					end)
+				else
 					Log:Warn("[M20] Purchase rejected: " .. tostring(err))
 					-- Visual feedback: flash red briefly
 					local old = card.BackgroundColor3
@@ -245,15 +275,36 @@ function M20_Shop:Show(player: Player)
 	backdrop.BorderSizePixel = 0
 	backdrop.Parent = screenGui
 
-	-- Modal
+	-- Modal (mit Scale-In-Animation)
 	local modal = Instance.new("Frame")
 	modal.Name = "ShopModal"
 	modal.Size = UDim2.new(0.75, 0, 0.7, 0)
-	modal.Position = UDim2.new(0.125, 0, 0.15, 0)
+	modal.AnchorPoint = Vector2.new(0.5, 0.5)
+	modal.Position = UDim2.new(0.5, 0, 0.5, 0)
 	modal.BackgroundColor3 = M20_Shop.Theme.BackgroundColor
 	modal.BorderSizePixel = 0
+	modal.BackgroundTransparency = 1  -- Start: invisible
 	modal.Parent = screenGui
 	makeUICorner(modal, UDim.new(0, 18))
+
+	-- Scale-In + Fade-In
+	task.defer(function()
+		if not modal or not modal.Parent then return end
+		local scale = modal:FindFirstChildOfClass("UIScale")
+		if not scale then
+			scale = Instance.new("UIScale")
+			scale.Parent = modal
+		end
+		scale.Scale = 0.85
+		TweenService:Create(scale,
+			TweenInfo.new(M20_Shop.Theme.TweenDuration * 2,
+				Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+			{ Scale = 1.0 }):Play()
+		TweenService:Create(modal,
+			TweenInfo.new(M20_Shop.Theme.TweenDuration * 1.5,
+				Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{ BackgroundTransparency = 0 }):Play()
+	end)
 
 	-- Header
 	local header = Instance.new("TextLabel")

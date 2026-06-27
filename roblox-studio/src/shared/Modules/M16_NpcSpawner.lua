@@ -229,6 +229,15 @@ local function attachProximityPrompt(model: Model, npcId: string)
 		M18:Show(playerWhoTriggered, config, greetingText)
 		Log:Info(("[M16] Dialogue geöffnet für %s mit %s"):format(playerWhoTriggered.Name, npcId))
 
+		-- Mark NPC-Talked: triggert Quest-Validators (hasTalkedToNpc)
+		pcall(function()
+			local ServiceRegistry = require(ReplicatedStorage.Shared.Util.ServiceRegistry)
+			local questService = ServiceRegistry:Get("Quest")
+			if questService and questService.MarkNpcTalked then
+				questService:MarkNpcTalked(playerWhoTriggered, npcId)
+			end
+		end)
+
 		-- Sound-Feedback (NPC-Greeting falls vorhanden)
 		pcall(function()
 			local soundService = game:GetService("SoundService")

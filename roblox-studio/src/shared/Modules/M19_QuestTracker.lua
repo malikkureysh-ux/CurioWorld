@@ -165,11 +165,11 @@ function M19_QuestTracker:CreateForPlayer(player: Player): ScreenGui
 	screenGui.DisplayOrder = 90
 	screenGui.Parent = playerGui
 
-	-- Container (oben rechts)
+	-- Container (oben rechts) — mit Slide-In von rechts
 	local container = Instance.new("Frame")
 	container.Name = "QuestTrackerContainer"
 	container.Size = UDim2.new(0, 260, 0, 240)
-	container.Position = UDim2.new(1, -280, 0, 20)
+	container.Position = UDim2.new(1, 60, 0, 20)  -- Start: 60px außerhalb rechts
 	container.BackgroundColor3 = M19_QuestTracker.Theme.BackgroundColor
 	container.BackgroundTransparency = M19_QuestTracker.Theme.BackgroundTransparency
 	container.BorderSizePixel = 0
@@ -179,6 +179,16 @@ function M19_QuestTracker:CreateForPlayer(player: Player): ScreenGui
 	stroke.Color = M19_QuestTracker.Theme.BorderColor
 	stroke.Thickness = M19_QuestTracker.Theme.BorderThickness
 	stroke.Parent = container
+
+	-- Slide-In-Animation: von rechts rein
+	task.defer(function()
+		if container and container.Parent then
+			TweenService:Create(container,
+				TweenInfo.new(M19_QuestTracker.Theme.TweenDuration * 2,
+					Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+				{ Position = UDim2.new(1, -280, 0, 20) }):Play()
+		end
+	end)
 
 	-- Header
 	local header = Instance.new("TextLabel")

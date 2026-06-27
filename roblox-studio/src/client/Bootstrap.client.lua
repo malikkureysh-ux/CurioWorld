@@ -70,3 +70,9 @@ task.spawn(setupHud)
 -- Controllers init (Client-only, kein Race mit Server)
 QuestDetailController:Init(Players.LocalPlayer)
 SoundController:Init()
+
+-- M20.Shop braucht SoundController-Referenz (für Kauf-Sound)
+pcall(function()
+	local M20_Shop = require(ReplicatedStorage.Shared.Modules.M20_Shop)
+	M20_Shop.SoundController = SoundController
+end)
