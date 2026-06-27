@@ -62,4 +62,14 @@ ServiceRegistry:Register("Telemetry", TelemetryService)
 ServiceRegistry:Register("Save", SaveService)
 ServiceRegistry:Register("Economy", EconomyService)
 
+-- NPC Spawn-System (Phase 2 audit fix)
+local NpcSpawner = require(ReplicatedStorage.Shared.Modules.M16_NpcSpawner)
+NpcSpawner:RegisterService()
+if harborContainer then
+    local spawnedNpcs = NpcSpawner:SpawnAll(Workspace.Districts)
+    local count = 0
+    for _ in pairs(spawnedNpcs) do count += 1 end
+    Log:Info(("NPCs gespawnt: %d"):format(count))
+end
+
 Log:Info("Server started. Services registered:", ServiceRegistry:List())

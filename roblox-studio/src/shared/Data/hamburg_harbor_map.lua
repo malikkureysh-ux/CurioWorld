@@ -7,9 +7,9 @@
 	Wird via Rojo in Roblox Studio synchronisiert.
 
 	Topographie:
-	- Hub-Plaza (Eingang, Teleport zu anderen Districts)
-	- Hafenbecken (zentraler See mit Kränen)
-	- Kran-Bereich (3 Kräne, Highlight-Mechanik)
+	- Hub-Anbindung (Verbindung zu Sky Plaza)
+	- Hafenbecken (zentraler See)
+	- Kran-Bereich (3 Kräne als Highlight-Mechanik D-014)
 	- Speicherhaus (Lager, Materialien, Bauquests)
 	- Werft (Bootsbau, Werkzeuge)
 	- Leuchtturm-Insel (Höhepunkt, Aussicht)
@@ -19,6 +19,22 @@
 	- Markt-Händlerin Yuki (Speicherhaus, merchant)
 	- Bootsbauerin Maja (Werft, crafter)
 	- Leuchtturmwächter Nils (Leuchtturm, story)
+
+	ASSET-PIPELINE:
+	===============
+	Visuelle Assets werden via Blender → FBX → Roblox-Upload → AssetId referenziert.
+
+	Upload-Workflow:
+	1. Blender-Pipeline ausführen (siehe roblox-studio/assets/blender-scripts/)
+	2. Output-FBX in roblox-studio/assets/fbx/ ist bereits vorhanden (16 Files)
+	3. In Roblox Studio: View → Asset Manager → Bulk Import → FBX wählen
+	4. Upload gibt AssetId (z.B. rbxassetid://123456789)
+	5. AssetId unten in PENDING_UPLOAD_* Platzhaltern ersetzen
+	6. Re-build mit `rojo build` → .rbxl enthält die echten Mesh-Refs
+
+	Die Platzhalter-Strategie erlaubt uns, die Map-Struktur und Validierung
+	vor dem Upload zu testen. Bei nicht-aufgelösten AssetIds rendert Roblox
+	eine Standard-Box mit grauer Farbe (sichtbar im Studio, harmlos).
 ]]
 
 local HamburgHarbor = {
@@ -39,31 +55,42 @@ local HamburgHarbor = {
 			Children = {
 				{
 					Name = "WelcomeSign",
-					ClassName = "Part",
+					-- Willkommens-Schild als MeshPart (FBX)
+					ClassName = "MeshPart",
 					Properties = {
 						Anchored = true,
 						CanCollide = false,
-						Size = Vector3.new(8, 4, 0.5),
+						MeshId = "rbxassetid://PENDING_UPLOAD_willkommen_schild_lod0",
+						Size = Vector3.new(2.6, 1.4, 0.15),
 						Position = Vector3.new(0, 8, -3),
+						-- SurfaceAppearance (Emissive-Texturen) statt Material-Property
+						-- wird nach Upload in Studio manuell zugewiesen
 					},
+					Attributes = { AssetSource = "Blender:willkommen_schild_lod0.fbx" },
 				},
 				{
-					Name = "HafenwirtinSpawn",
+					-- NPC-Spawn-Anker (kein Mesh — Spawner instanziiert echten NPC)
+					Name = "NpcSpawn_Hafenwirtin",
 					ClassName = "Part",
 					Properties = {
 						Anchored = true,
 						CanCollide = false,
-						Transparency = 1,
-						Size = Vector3.new(1, 2, 1),
+						Transparency = 1,  -- unsichtbar, nur Position+Metadaten
+						Size = Vector3.new(0.5, 2, 0.5),
 						Position = Vector3.new(0, 6, -2),
-						Attributes = { NpcId = "Hafenwirtin", Role = "QuestGiver" },
+					},
+					Attributes = {
+						NpcId = "Hafenwirtin",
+						Role = "QuestGiver",
+						MeshAssetId = "rbxassetid://PENDING_UPLOAD_npc_basis_female_lod0",
+						Outfit = "Hafenwirtin_Default",
 					},
 				},
 			},
 		},
 
 		-- ============================================================
-		-- Zentrales Hafenbecken
+		-- Zentrales Hafenbecken (Wasser-Plane)
 		-- ============================================================
 		{
 			Name = "HarborBasin",
@@ -74,6 +101,7 @@ local HamburgHarbor = {
 				Size = Vector3.new(80, 1, 60),
 				Position = Vector3.new(0, 0.5, 20),
 				BrickColor = BrickColor.new("Bright blue"),
+				Transparency = 0.3,  -- leicht durchsichtig für Tiefenwirkung
 			},
 		},
 
@@ -83,110 +111,77 @@ local HamburgHarbor = {
 		{
 			Name = "CraneArea",
 			ClassName = "Model",
-			Properties = {},
+			Properties = {
+				PrimaryPart = "CraneA",
+			},
 			Children = {
 				{
 					Name = "CraneA",
-					ClassName = "Model",
+					ClassName = "MeshPart",
 					Properties = {
-						PrimaryPart = "Base",
+						Anchored = true,
+						CanCollide = true,
+						MeshId = "rbxassetid://PENDING_UPLOAD_kran_lod0",
+						-- Kran-FBX ist 14 BU hoch (Mast 12 + Container-Höhe), centered
+						Size = Vector3.new(20, 14, 4),
+						Position = Vector3.new(-15, 7, 15),
+					},
+					Attributes = {
+						AssetSource = "Blender:kran_lod0.fbx",
+						QuestHook = "HH_02_crane_firstlift",
+						CraneId = "CraneA",
+						Grappleable = true,
 					},
 					Children = {
 						{
-							Name = "Base",
-							ClassName = "Part",
-							Properties = {
-								Anchored = true,
-								Material = Enum.Material.Metal,
-								Color = Color3.fromRGB(242, 140, 51), -- Werft-Orange
-								Size = Vector3.new(4, 12, 4),
-								Position = Vector3.new(-25, 6, 15),
-							},
-						},
-						{
-							Name = "Arm",
-							ClassName = "Part",
-							Properties = {
-								Anchored = true,
-								Material = Enum.Material.Metal,
-								Color = Color3.fromRGB(242, 140, 51),
-								Size = Vector3.new(20, 2, 2),
-								Position = Vector3.new(-15, 12, 15),
-							},
-						},
-						{
+							-- Quest-Trigger: Container-Crate am Haken
 							Name = "ContainerSpawn",
-							ClassName = "Part",
+							ClassName = "MeshPart",
 							Properties = {
-								Anchored = true,
-								CanCollide = false,
-								Transparency = 1, -- Invisible spawn point
-								Size = Vector3.new(2, 2, 2),
+								Anchored = false,
+								CanCollide = true,
+								MeshId = "rbxassetid://PENDING_UPLOAD_kiste_lod0",
+								Size = Vector3.new(1.6, 1.6, 1.6),
 								Position = Vector3.new(-5, 9, 15),
-								Attributes = {
-									QuestHook = "HH_02_crane_firstlift",
-									ContainerType = "Crate",
-								},
+							},
+							Attributes = {
+								QuestHook = "HH_02_crane_firstlift",
+								ContainerType = "Crate",
+								Pickupable = true,
 							},
 						},
 					},
 				},
 				{
 					Name = "CraneB",
-					ClassName = "Model",
-					Properties = { PrimaryPart = "Base" },
-					Children = {
-						{
-							Name = "Base",
-							ClassName = "Part",
-							Properties = {
-								Anchored = true,
-								Material = Enum.Material.Metal,
-								Color = Color3.fromRGB(242, 140, 51),
-								Size = Vector3.new(4, 12, 4),
-								Position = Vector3.new(0, 6, 35),
-							},
-						},
-						{
-							Name = "Arm",
-							ClassName = "Part",
-							Properties = {
-								Anchored = true,
-								Material = Enum.Material.Metal,
-								Color = Color3.fromRGB(242, 140, 51),
-								Size = Vector3.new(20, 2, 2),
-								Position = Vector3.new(10, 12, 35),
-							},
-						},
+					ClassName = "MeshPart",
+					Properties = {
+						Anchored = true,
+						CanCollide = true,
+						MeshId = "rbxassetid://PENDING_UPLOAD_kran_lod0",
+						Size = Vector3.new(20, 14, 4),
+						Position = Vector3.new(10, 7, 35),
+					},
+					Attributes = {
+						AssetSource = "Blender:kran_lod0.fbx",
+						CraneId = "CraneB",
+						Grappleable = true,
 					},
 				},
 				{
 					Name = "CraneC",
-					ClassName = "Model",
-					Properties = { PrimaryPart = "Base" },
-					Children = {
-						{
-							Name = "Base",
-							ClassName = "Part",
-							Properties = {
-								Anchored = true,
-								Material = Enum.Material.Metal,
-								Color = Color3.fromRGB(242, 140, 51),
-								Size = Vector3.new(4, 12, 4),
-								Position = Vector3.new(25, 6, 15),
-							},
-						},
-						{
-							Name = "Arm",
-							ClassName = "Part",
-							Properties = {
-								Anchored = true,
-								Material = Enum.Material.Metal,
-								Color = Color3.fromRGB(242, 140, 51),
-								Size = Vector3.new(20, 2, 2),
-								Position = Vector3.new(15, 12, 15),
-							},
-						},
+					ClassName = "MeshPart",
+					Properties = {
+						Anchored = true,
+						CanCollide = true,
+						MeshId = "rbxassetid://PENDING_UPLOAD_kran_lod0",
+						Size = Vector3.new(20, 14, 4),
+						Position = Vector3.new(15, 7, 15),
+					},
+					Attributes = {
+						AssetSource = "Blender:kran_lod0.fbx",
+						CraneId = "CraneC",
+						Grappleable = true,
 					},
 				},
 			},
@@ -197,54 +192,53 @@ local HamburgHarbor = {
 		-- ============================================================
 		{
 			Name = "Speicherhaus",
-			ClassName = "Model",
-			Properties = { PrimaryPart = "Floor" },
+			ClassName = "MeshPart",
+			Properties = {
+				Anchored = true,
+				CanCollide = true,
+				MeshId = "rbxassetid://PENDING_UPLOAD_speicherhaus_lod0",
+				-- Speicherhaus-FBX ist ~16 BU breit, ~14 BU hoch
+				Size = Vector3.new(17, 14, 13),
+				Position = Vector3.new(-40, 7, 30),
+			},
+			Attributes = {
+				AssetSource = "Blender:speicherhaus_lod0.fbx",
+				BuildingType = "Warehouse",
+			},
 			Children = {
 				{
-					Name = "Floor",
-					ClassName = "Part",
+					-- Kistenstapel im Speicherhaus (Deko)
+					Name = "MaterialStorage",
+					ClassName = "MeshPart",
 					Properties = {
 						Anchored = true,
-						Material = Enum.Material.WoodPlanks,
-						Color = Color3.fromRGB(217, 178, 127), -- Hafen-Beige
-						Size = Vector3.new(20, 0.5, 16),
-						Position = Vector3.new(-40, 4, 30),
+						CanCollide = true,
+						MeshId = "rbxassetid://PENDING_UPLOAD_kiste_lod0",
+						Size = Vector3.new(1.6, 1.6, 1.6),
+						Position = Vector3.new(-44, 1.5, 28),
+					},
+					Attributes = {
+						MaterialType = "Wood",
+						Quantity = 100,
+						Pickupable = true,
 					},
 				},
 				{
-					Name = "Walls",
-					ClassName = "Part",
-					Properties = {
-						Anchored = true,
-						Material = Enum.Material.Brick,
-						Color = Color3.fromRGB(180, 100, 60),
-						Size = Vector3.new(20, 8, 16),
-						Position = Vector3.new(-40, 8, 30),
-						Transparency = 0.2, -- see-through for now
-					},
-				},
-				{
-					Name = "YukiSpawn",
+					-- NPC-Spawn-Anker für Yuki
+					Name = "NpcSpawn_Yuki",
 					ClassName = "Part",
 					Properties = {
 						Anchored = true,
 						CanCollide = false,
 						Transparency = 1,
-						Size = Vector3.new(1, 2, 1),
+						Size = Vector3.new(0.5, 2, 0.5),
 						Position = Vector3.new(-40, 6, 32),
-						Attributes = { NpcId = "Yuki", Role = "Merchant" },
 					},
-				},
-				{
-					Name = "MaterialStorage",
-					ClassName = "Part",
-					Properties = {
-						Anchored = true,
-						Material = Enum.Material.Wood,
-						Color = Color3.fromRGB(160, 100, 50),
-						Size = Vector3.new(3, 3, 3),
-						Position = Vector3.new(-44, 6, 28),
-						Attributes = { MaterialType = "Wood", Quantity = 100 },
+					Attributes = {
+						NpcId = "Yuki",
+						Role = "Merchant",
+						MeshAssetId = "rbxassetid://PENDING_UPLOAD_npc_basis_female_lod0",
+						Outfit = "Yuki_Merchant",
 					},
 				},
 			},
@@ -255,42 +249,88 @@ local HamburgHarbor = {
 		-- ============================================================
 		{
 			Name = "Werft",
-			ClassName = "Model",
-			Properties = { PrimaryPart = "Floor" },
+			ClassName = "MeshPart",
+			Properties = {
+				Anchored = true,
+				CanCollide = true,
+				MeshId = "rbxassetid://PENDING_UPLOAD_dock_planke_lod0",
+				-- Dock-Planke als Boden-Basis (5 BU lang, 1 BU breit, 0.2 BU hoch)
+				Size = Vector3.new(16, 0.5, 12),
+				Position = Vector3.new(40, 4, 35),
+			},
+			Attributes = {
+				AssetSource = "Blender:dock_planke_lod0.fbx",
+				BuildingType = "Shipyard",
+			},
 			Children = {
 				{
-					Name = "Floor",
-					ClassName = "Part",
-					Properties = {
-						Anchored = true,
-						Material = Enum.Material.Concrete,
-						Color = Color3.fromRGB(150, 150, 150),
-						Size = Vector3.new(16, 0.5, 12),
-						Position = Vector3.new(40, 4, 35),
-					},
-				},
-				{
 					Name = "Workbench",
-					ClassName = "Part",
+					ClassName = "MeshPart",
 					Properties = {
 						Anchored = true,
-						Material = Enum.Material.Wood,
-						Color = Color3.fromRGB(140, 80, 40),
+						CanCollide = true,
+						MeshId = "rbxassetid://PENDING_UPLOAD_dock_planke_lod0",
 						Size = Vector3.new(4, 1, 2),
 						Position = Vector3.new(38, 4.5, 33),
-						Attributes = { QuestHook = "HH_03_werft_boat" },
+					},
+					Attributes = { QuestHook = "HH_03_werft_boat" },
+				},
+				{
+					-- Boot (Quest-Resultat HH_03)
+					Name = "Boat_Built",
+					ClassName = "MeshPart",
+					Properties = {
+						Anchored = true,
+						CanCollide = true,
+						MeshId = "rbxassetid://PENDING_UPLOAD_boot_lod0",
+						Size = Vector3.new(4.6, 1, 1.5),
+						Position = Vector3.new(42, 1.5, 33),
+					},
+					Attributes = {
+						AssetSource = "Blender:boot_lod0.fbx",
+						QuestReward = "HH_03_werft_boat",
+						VisibleAfterQuest = "HH_03_werft_boat",
 					},
 				},
 				{
-					Name = "MajaSpawn",
+					Name = "Fass_Deko",
+					ClassName = "MeshPart",
+					Properties = {
+						Anchored = true,
+						CanCollide = true,
+						MeshId = "rbxassetid://PENDING_UPLOAD_fass_lod0",
+						Size = Vector3.new(1.4, 1.4, 1.4),
+						Position = Vector3.new(43, 1.7, 36),
+					},
+					Attributes = { AssetSource = "Blender:fass_lod0.fbx" },
+				},
+				{
+					Name = "Anker_Deko",
+					ClassName = "MeshPart",
+					Properties = {
+						Anchored = true,
+						CanCollide = false,
+						MeshId = "rbxassetid://PENDING_UPLOAD_anker_lod0",
+						Size = Vector3.new(1, 2.2, 1),
+						Position = Vector3.new(36, 1.3, 36),
+					},
+					Attributes = { AssetSource = "Blender:anker_lod0.fbx" },
+				},
+				{
+					Name = "NpcSpawn_Maja",
 					ClassName = "Part",
 					Properties = {
 						Anchored = true,
 						CanCollide = false,
 						Transparency = 1,
-						Size = Vector3.new(1, 2, 1),
+						Size = Vector3.new(0.5, 2, 0.5),
 						Position = Vector3.new(42, 6, 33),
-						Attributes = { NpcId = "Maja", Role = "Crafter" },
+					},
+					Attributes = {
+						NpcId = "Maja",
+						Role = "Crafter",
+						MeshAssetId = "rbxassetid://PENDING_UPLOAD_npc_basis_female_lod0",
+						Outfit = "Maja_Crafter",
 					},
 				},
 			},
@@ -301,77 +341,122 @@ local HamburgHarbor = {
 		-- ============================================================
 		{
 			Name = "LighthouseIsland",
-			ClassName = "Model",
-			Properties = { PrimaryPart = "Lighthouse" },
+			ClassName = "MeshPart",
+			Properties = {
+				Anchored = true,
+				CanCollide = true,
+				MeshId = "rbxassetid://PENDING_UPLOAD_leuchtturm_lod0",
+				-- Leuchtturm-FBX ist ~14 BU hoch, ~3 BU breit
+				Size = Vector3.new(3, 14, 3),
+				Position = Vector3.new(0, 7, 60),
+			},
+			Attributes = {
+				AssetSource = "Blender:leuchtturm_lod0.fbx",
+				BuildingType = "Landmark",
+				-- Die Laterne (oberster Part des Leuchtturms) emittiert Licht.
+				-- SurfaceAppearance + Emission-Map werden in Studio nach Upload gesetzt.
+				EmitsLight = true,
+				LightColorHex = "FFDC64",
+				LightRadius = 60,
+			},
 			Children = {
 				{
-					Name = "Island",
-					ClassName = "Part",
+					Name = "Island_Base",
+					ClassName = "MeshPart",
 					Properties = {
 						Anchored = true,
-						Material = Enum.Material.Sand,
-						Color = Color3.fromRGB(220, 200, 160),
+						CanCollide = true,
+						MeshId = "rbxassetid://PENDING_UPLOAD_anker_lod0",
+						-- Sand-Insel-Sockel (mit Anker-FBX als Platzhalter bis eigenes Insel-Mesh existiert)
 						Size = Vector3.new(8, 2, 8),
 						Position = Vector3.new(0, 1, 60),
+						BrickColor = BrickColor.new("Brick yellow"),
 					},
+					Attributes = { AssetSource = "TEMP:anker_lod0.fbx (Insel-Mesh in Phase 3)" },
 				},
 				{
-					Name = "Lighthouse",
-					ClassName = "Part",
-					Properties = {
-						Anchored = true,
-						Material = Enum.Material.Metal,
-						Color = Color3.fromRGB(255, 255, 255),
-						Size = Vector3.new(2, 18, 2),
-						Position = Vector3.new(0, 11, 60),
-					},
-				},
-				{
-					Name = "LighthouseTop",
-					ClassName = "Part",
-					Properties = {
-						Anchored = true,
-						Material = Enum.Material.Neon,
-						Color = Color3.fromRGB(255, 220, 100), -- Laterne-Gelb
-						Size = Vector3.new(3, 2, 3),
-						Position = Vector3.new(0, 21, 60),
-						Attributes = { EmitsLight = true, ColorHex = "FFDC64" },
-					},
-				},
-				{
-					Name = "NilsSpawn",
+					Name = "NpcSpawn_Nils",
 					ClassName = "Part",
 					Properties = {
 						Anchored = true,
 						CanCollide = false,
 						Transparency = 1,
-						Size = Vector3.new(1, 2, 1),
+						Size = Vector3.new(0.5, 2, 0.5),
 						Position = Vector3.new(0, 4, 62),
-						Attributes = { NpcId = "Nils", Role = "Story" },
+					},
+					Attributes = {
+						NpcId = "Nils",
+						Role = "Story",
+						MeshAssetId = "rbxassetid://PENDING_UPLOAD_npc_basis_male_lod0",
+						Outfit = "Nils_Watchman",
 					},
 				},
 			},
 		},
 
 		-- ============================================================
-		-- Quest-Starter-Schilder (für Hafenwirtin & Tagesaufgaben)
+		-- Quest-Starter-Tafel (für Hafenwirtin & Tagesaufgaben)
 		-- ============================================================
 		{
 			Name = "QuestBoards",
+			ClassName = "MeshPart",
+			Properties = {
+				Anchored = true,
+				CanCollide = false,
+				MeshId = "rbxassetid://PENDING_UPLOAD_quest_tafel_lod0",
+				Size = Vector3.new(2.5, 2.0, 0.5),
+				Position = Vector3.new(5, 3.5, 5),
+			},
+			Attributes = {
+				AssetSource = "Blender:quest_tafel_lod0.fbx",
+				QuestType = "Daily",
+				RefreshHours = 24,
+			},
+		},
+
+		-- ============================================================
+		-- Hafen-Laternen (Atmosphäre entlang der Kaimauern)
+		-- ============================================================
+		{
+			Name = "Lanterns",
 			ClassName = "Folder",
+			Properties = {},
 			Children = {
-				{
-					Name = "DailyQuestBoard",
-					ClassName = "Part",
-					Properties = {
-						Anchored = true,
-						Material = Enum.Material.Wood,
-						Color = Color3.fromRGB(110, 75, 50),
-						Size = Vector3.new(4, 6, 0.5),
-						Position = Vector3.new(5, 7, 5),
-						Attributes = { QuestType = "Daily", RefreshHours = 24 },
-					},
-				},
+				{ Name = "Lantern_1", ClassName = "MeshPart",
+				  Properties = {
+					  Anchored = true, CanCollide = false,
+					  MeshId = "rbxassetid://PENDING_UPLOAD_laterne_lod0",
+					  Size = Vector3.new(0.5, 3.5, 0.5),
+					  Position = Vector3.new(-10, 1.75, -5),
+				  }},
+				{ Name = "Lantern_2", ClassName = "MeshPart",
+				  Properties = {
+					  Anchored = true, CanCollide = false,
+					  MeshId = "rbxassetid://PENDING_UPLOAD_laterne_lod0",
+					  Size = Vector3.new(0.5, 3.5, 0.5),
+					  Position = Vector3.new(-15, 1.75, 10),
+				  }},
+				{ Name = "Lantern_3", ClassName = "MeshPart",
+				  Properties = {
+					  Anchored = true, CanCollide = false,
+					  MeshId = "rbxassetid://PENDING_UPLOAD_laterne_lod0",
+					  Size = Vector3.new(0.5, 3.5, 0.5),
+					  Position = Vector3.new(10, 1.75, 0),
+				  }},
+				{ Name = "Lantern_4", ClassName = "MeshPart",
+				  Properties = {
+					  Anchored = true, CanCollide = false,
+					  MeshId = "rbxassetid://PENDING_UPLOAD_laterne_lod0",
+					  Size = Vector3.new(0.5, 3.5, 0.5),
+					  Position = Vector3.new(20, 1.75, 25),
+				  }},
+				{ Name = "Lantern_5", ClassName = "MeshPart",
+				  Properties = {
+					  Anchored = true, CanCollide = false,
+					  MeshId = "rbxassetid://PENDING_UPLOAD_laterne_lod0",
+					  Size = Vector3.new(0.5, 3.5, 0.5),
+					  Position = Vector3.new(-25, 1.75, 30),
+				  }},
 			},
 		},
 	},
