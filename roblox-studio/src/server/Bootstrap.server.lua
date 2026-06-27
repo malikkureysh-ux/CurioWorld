@@ -63,12 +63,20 @@ local SaveService       = require(ServerScriptService.Services.SaveService)
 local EconomyService    = require(ServerScriptService.Services.EconomyService)
 local QuestService      = require(ServerScriptService.Services.QuestService)
 local QuestVisibilityService = require(ServerScriptService.Services.QuestVisibilityService)
+local M14_Parental      = require(ServerScriptService.Services.M14_Parental)
 
 ServiceRegistry:Register("Telemetry", TelemetryService)
 ServiceRegistry:Register("Save", SaveService)
 ServiceRegistry:Register("Economy", EconomyService)
 ServiceRegistry:Register("Quest", QuestService)
 ServiceRegistry:Register("QuestVisibility", QuestVisibilityService)
+ServiceRegistry:Register("Parental", M14_Parental)
+
+-- M08 Accessibility (client+server shared) — init hook
+pcall(function()
+	local M08_Accessibility = require(ReplicatedStorage.Shared.Modules.M08_Accessibility)
+	M08_Accessibility:Init()
+end)
 
 -- ============================================================
 -- 3. NPC-Spawn (uses Map + emits ProximityPrompts for UI-Trigger)

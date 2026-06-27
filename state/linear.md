@@ -538,15 +538,21 @@
 - [x] M10_Housing.spec.lua (12 tests) ✅
 - [x] M11_Companion.spec.lua (14 tests) ✅
 
-**Total tests: 249 (was 196 → +53). Production modules: 9/15 → 13/15 with runtime. M12/M14/M08 still type-only stubs.**
+### Wave 10 — COPPA/DSGVO + Accessibility ✅ DONE (2026-06-27 21:50)
+- [x] M14_Parental (new, server-side Service): Consent + PlayTime + GDPR Privacy ✅
+- [x] M08_Accessibility (new, shared): Theme + ReducedMotion-Tween-Hook ✅
+- [x] Workbench: InteractType=QuestStart + ProximityPrompt 'Werkbank benutzen' ✅
+- [x] QuestBoards: InteractType=QuestBoard + ProximityPrompt 'Tagesaufgaben ansehen' ✅
+- [x] Island_Base: Anker-FBX-Placeholder → Roblox-Primitive Cylinder (Sand) ✅
+- [x] M08_Accessibility.spec.lua (12 tests) ✅
+- [x] M14_Parental.spec.lua (12 tests) ✅
+
+**Total tests: 273 (was 249 → +24). Production modules: 13/15 → 15/15 with runtime. Only M12 Animation-Editor deferred.**
 
 ### Verbleibend (deferred)
-- [ ] M08 Accessibility (type-only), M12 Animation-Editor, M14 Privacy/Parental-Dashboard (type-only)
+- [ ] M12 Animation-Editor (Studio-Plugin statt Runtime)
 - [ ] AES-256-GCM via KMS (aktuell: XOR-Cipher)
 - [ ] Asset-Upload (13 FBX + 6 Sounds + 4 Animations)
-- [ ] Workbench quest hook consumer
-- [ ] QuestBoards refresh logic
-- [ ] Island_Base mesh replacement
 
 ---
 

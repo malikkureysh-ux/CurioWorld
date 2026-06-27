@@ -296,8 +296,24 @@ local HamburgHarbor = {
 						MeshId = "rbxassetid://PENDING_UPLOAD_dock_planke_lod0",
 						Size = Vector3.new(4, 1, 2),
 						Position = Vector3.new(38, 4.5, 33),
+						BrickColor = BrickColor.new("Brown"),
 					},
-					Attributes = { QuestHook = "HH_03_werft_boat" },
+					Attributes = {
+						QuestHook = "HH_03_werft_boat",
+						InteractType = "QuestStart",
+					},
+					Children = {
+						{
+							Name = "WorkbenchPrompt",
+							ClassName = "ProximityPrompt",
+							Properties = {
+								ActionText = "Werkbank benutzen",
+								HoldDuration = 0,
+								MaxActivationDistance = 6,
+								RequiresLineOfSight = true,
+							},
+						},
+					},
 				},
 				{
 					-- Boot (Quest-Resultat HH_03)
@@ -386,17 +402,18 @@ local HamburgHarbor = {
 			Children = {
 				{
 					Name = "Island_Base",
-					ClassName = "MeshPart",
+					ClassName = "Part",
 					Properties = {
 						Anchored = true,
 						CanCollide = true,
-						MeshId = "rbxassetid://PENDING_UPLOAD_anker_lod0",
-						-- Sand-Insel-Sockel (mit Anker-FBX als Platzhalter bis eigenes Insel-Mesh existiert)
-						Size = Vector3.new(8, 2, 8),
+						Shape = Enum.PartType.Cylinder,
+						-- Sand-Insel-Sockel (Cylinder statt FBX-Placeholder, damit ohne Asset-Upload sichtbar)
+						Size = Vector3.new(2, 14, 14),  -- Cylinder: diameter=Size.X, height=Size.Y
 						Position = Vector3.new(0, 1, 60),
+						Material = Enum.Material.Sand,
 						BrickColor = BrickColor.new("Brick yellow"),
 					},
-					Attributes = { AssetSource = "TEMP:anker_lod0.fbx (Insel-Mesh in Phase 3)" },
+					Attributes = { AssetSource = "Primitive:Sand-Cylinder (replace with island FBX in Phase 3)" },
 				},
 				{
 					Name = "NpcSpawn_Nils",
@@ -430,11 +447,25 @@ local HamburgHarbor = {
 				MeshId = "rbxassetid://PENDING_UPLOAD_quest_tafel_lod0",
 				Size = Vector3.new(2.5, 2.0, 0.5),
 				Position = Vector3.new(5, 3.5, 5),
+				BrickColor = BrickColor.new("Dark stone grey"),
 			},
 			Attributes = {
 				AssetSource = "Blender:quest_tafel_lod0.fbx",
 				QuestType = "Daily",
 				RefreshHours = 24,
+				InteractType = "QuestBoard",
+			},
+			Children = {
+				{
+					Name = "QuestBoardPrompt",
+					ClassName = "ProximityPrompt",
+					Properties = {
+						ActionText = "Tagesaufgaben ansehen",
+						HoldDuration = 0,
+						MaxActivationDistance = 7,
+						RequiresLineOfSight = true,
+					},
+				},
 			},
 		},
 
