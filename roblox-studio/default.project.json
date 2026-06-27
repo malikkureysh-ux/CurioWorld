@@ -57,7 +57,7 @@
     "SoundService": {
       "$className": "SoundService",
       "$properties": {
-        "AmbientReverb": "Hafen",
+        "AmbientReverb": "City",
         "RespectFilteringEnabled": true,
         "RolloffScale": 1.0,
         "DopplerScale": 1.0
@@ -114,7 +114,6 @@
         }
       }
     },
-    "ReplicatedStorage": {
     "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
       "Shared": {

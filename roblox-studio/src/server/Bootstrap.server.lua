@@ -1,38 +1,40 @@
 --!strict
 --[[
-	init.server.lua — Server Bootstrap
-	==================================
+	Bootstrap.server.lua — Server Bootstrap (FINAL)
+	================================================
 
-	Bootstraps the server-side services in dependency order:
-	1. Log + ServiceRegistry + MapBuilder — utility infrastructure
-	2. TelemetryService — first, so other services can track
-	3. SaveService — before everything that persists data
-	4. EconomyService — depends on Save + Telemetry
-	5. (Phase 3+ services register here)
+	Bootstraps the server-side services + UI + NPCs + Sounds in dependency order:
 
-	Map-Building:
-	- Liest hamburg_harbor_map.lua und baut die Hierarchie im Workspace.
-	- Validierung läuft zuerst; bei Fehlern wird der Build abgebrochen.
+	1. Map-Validate + Build (must succeed before anything else)
+	2. NPC-Spawn (after Map, before UI)
+	3. Services register themselves
+	4. UI-Controllers spawned for each player on join
+	5. Sound-Controllers started
+
+	Failures abort with error() (Fail-Loud-Strategy).
 ]]
 
 local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+local SoundService = game:GetService("SoundService")
 
--- Utilities
 local Log = require(ReplicatedStorage.Shared.Util.Log)
 local ServiceRegistry = require(ReplicatedStorage.Shared.Util.ServiceRegistry)
 local MapBuilder = require(ReplicatedStorage.Shared.Modules.MapBuilder)
+local M16_NpcSpawner = require(ReplicatedStorage.Shared.Modules.M16_NpcSpawner)
 
--- Map data
+-- ============================================================
+-- 1. Map-Validate + Build
+-- ============================================================
+
 local HamburgHarborData = require(ReplicatedStorage.Shared.Data.hamburg_harbor_map)
 
--- In Studio, enable Debug logging for visible feedback
 if game:GetService("RunService"):IsStudio() then
 	Log:SetLevel("Debug")
 end
 
--- Validate map data BEFORE building
 local valid, errors = MapBuilder:Validate(HamburgHarborData)
 if not valid then
 	Log:Error("Map validation failed:")
@@ -42,9 +44,8 @@ if not valid then
 	error("Map data invalid — see logs above")
 end
 
--- Build Hamburg Harbor map into Workspace
 local harborContainer = Workspace:FindFirstChild("Districts")
-	and Workspace.Districts:FindFirstChild("HamburgHarbor")
+    and Workspace.Districts:FindFirstChild("HamburgHarbor")
 
 if harborContainer then
 	MapBuilder:BuildInto(HamburgHarborData, harborContainer)
@@ -52,24 +53,79 @@ else
 	Log:Warn("Workspace.Districts.HamburgHarbor not found — skipping map build")
 end
 
--- Domain services (require in dependency order)
+-- ============================================================
+-- 2. Domain-Services (register BEFORE NPC-Spawn so NPCs can query them)
+-- ============================================================
+
 local TelemetryService = require(ServerScriptService.Services.TelemetryService)
 local SaveService       = require(ServerScriptService.Services.SaveService)
 local EconomyService    = require(ServerScriptService.Services.EconomyService)
 
--- Register all services
 ServiceRegistry:Register("Telemetry", TelemetryService)
 ServiceRegistry:Register("Save", SaveService)
 ServiceRegistry:Register("Economy", EconomyService)
 
--- NPC Spawn-System (Phase 2 audit fix)
-local NpcSpawner = require(ReplicatedStorage.Shared.Modules.M16_NpcSpawner)
-NpcSpawner:RegisterService()
+-- ============================================================
+-- 3. NPC-Spawn (uses Map + emits ProximityPrompts for UI-Trigger)
+-- ============================================================
+
+M16_NpcSpawner:RegisterService()
 if harborContainer then
-    local spawnedNpcs = NpcSpawner:SpawnAll(Workspace.Districts)
-    local count = 0
-    for _ in pairs(spawnedNpcs) do count += 1 end
-    Log:Info(("NPCs gespawnt: %d"):format(count))
+	local spawnedNpcs = M16_NpcSpawner:SpawnAll(Workspace.Districts)
+	local count = 0
+	for _ in pairs(spawnedNpcs) do count += 1 end
+	Log:Info(("NPCs gespawnt: %d"):format(count))
+end
+
+-- ============================================================
+-- 4. UI-Controllers: HUD + QuestTracker spawn on PlayerAdded
+-- ============================================================
+
+local M17_HUD = require(ReplicatedStorage.Shared.Modules.M17_HUD)
+local M19_QuestTracker = require(ReplicatedStorage.Shared.Modules.M19_QuestTracker)
+
+local function onPlayerAdded(player: Player)
+	-- HUD
+	local hud = M17_HUD:CreateForPlayer(player)
+	-- Initial-Currency aus EconomyService
+	pcall(function()
+		local economy = ServiceRegistry:Get("Economy")
+		if economy and economy.GetBalance then
+			local bal = economy:GetBalance(player)
+			if bal then
+				M17_HUD:UpdateCurrency(hud, "Gold", bal.gold or 0)
+				M17_HUD:UpdateCurrency(hud, "Gems", bal.gems or 0)
+				if bal.vipActive then
+					M17_HUD:SetVIP(hud, true)
+				end
+			end
+		end
+	end)
+	M17_HUD:SetDistrict(hud, "HamburgHarbor")
+
+	-- QuestTracker
+	M19_QuestTracker:CreateForPlayer(player)
+	M19_QuestTracker:Update(player, {})
+
+	-- Sound: Auto-Play Ambient wenn Studio / Test-Server läuft
+	spawn(function()
+		if game:GetService("RunService"):IsStudio() then
+			local ambient = SoundService:FindFirstChild("Ambient_Hafen")
+			if ambient and ambient:IsA("Sound") then
+				ambient.Looped = true
+				ambient.Volume = 0.3
+				ambient:Play()
+				Log:Info("Ambient_Hafen gestartet (Studio)")
+			end
+		end
+	end)
+
+	Log:Info("[Bootstrap] UI created for " .. player.Name)
+end
+
+Players.PlayerAdded:Connect(onPlayerAdded)
+for _, existingPlayer in ipairs(Players:GetPlayers()) do
+	task.spawn(onPlayerAdded, existingPlayer)
 end
 
 Log:Info("Server started. Services registered:", ServiceRegistry:List())
