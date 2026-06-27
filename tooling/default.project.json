@@ -1,0 +1,42 @@
+{
+    "name": "Roblox Studio - Blender - MCP (tooling)",
+    "tree": {
+        "$className": "DataModel",
+
+        "ReplicatedStorage": {
+            "$className": "ReplicatedStorage",
+            "$path": "src/shared",
+
+            "Remotes": {
+                "$className": "Folder"
+            },
+
+            "Packages": {
+                "$className": "Folder",
+                "$path": "Packages"
+            }
+        },
+
+        "ServerScriptService": {
+            "$className": "ServerScriptService",
+            "$path": "src/server"
+        },
+
+        "StarterPlayer": {
+            "$className": "StarterPlayer",
+            "$properties": {
+                "CharacterWalkSpeed": 16,
+                "CharacterJumpPower": 50
+            },
+
+            "StarterPlayerScripts": {
+                "$className": "StarterPlayerScripts",
+                "$path": "src/client"
+            }
+        },
+
+        "Workspace": {
+            "$className": "Workspace"
+        }
+    }
+}

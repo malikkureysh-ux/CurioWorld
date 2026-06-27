@@ -1,0 +1,72 @@
+{
+  "name": "CurioWorld",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Shared": {
+        "$className": "Folder",
+        "Modules": {
+          "$folder": "src/shared/Modules"
+        },
+        "Data": {
+          "$folder": "src/shared/Data"
+        },
+        "Util": {
+          "$folder": "src/shared/Util"
+        }
+      },
+      "Locale": {
+        "$className": "Folder"
+      }
+    },
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "Services": {
+        "$folder": "src/server/Services"
+      },
+      "init.server.lua": {
+        "$path": "src/server/init.server.lua"
+      }
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "Controllers": {
+          "$folder": "src/client/Controllers"
+        },
+        "init.client.lua": {
+          "$path": "src/client/init.client.lua"
+        }
+      }
+    },
+    "Workspace": {
+      "$className": "Workspace",
+      "Districts": {
+        "$className": "Folder",
+        "HamburgHarbor": {
+          "$className": "Folder"
+        },
+        "SkyBridgeBay": {
+          "$className": "Folder"
+        },
+        "LibertyBlocks": {
+          "$className": "Folder"
+        },
+        "NeoSakura": {
+          "$className": "Folder"
+        },
+        "MoonBazaar": {
+          "$className": "Folder"
+        }
+      },
+      "Hub": {
+        "$className": "Folder",
+        "SkyPlaza": {
+          "$className": "Folder"
+        }
+      }
+    }
+  }
+}

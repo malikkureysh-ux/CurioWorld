@@ -1,0 +1,18 @@
+# Build artifacts
+sourcemap.json
+*.rbxl
+*.rbxlx
+
+# Wally / Packages
+Packages/
+ServerPackages/
+DevPackages/
+wally-lock.toml.lock
+
+# IDE
+.vscode/
+.idea/
+
+# Blender-Workspace-Files (3D-Modelle)
+*.blend1
+*.blend2

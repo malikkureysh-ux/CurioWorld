@@ -1,0 +1,15 @@
+# Wally-Konfiguration für das Roblox-Projekt.
+# Packages werden in Packages/ installiert (siehe default.project.json).
+
+[package]
+name = "malikn9u/team-survival"
+description = "Team Survival Roblox Game"
+version = "0.1.0"
+license = "MIT"
+authors = ["malikn9u"]
+realm = "shared"
+registry = "https://github.com/UpliftGames/wally-index"
+
+[dependencies]
+# Test framework
+TestEZ = "roblox/testez@0.4.1"
