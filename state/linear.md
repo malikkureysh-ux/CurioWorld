@@ -469,33 +469,47 @@
 - [x] X-010: M24 language dropdown wiring (1 line) ✅
 - [x] Y-001: M17 DisplayOrder (1 line) ✅
 
-### Wave 2 — Compliance & Safety ✅ PARTIALLY DONE
+### Wave 2 — Compliance & Safety ✅ DONE (2026-06-27 21:25)
 - [x] X-006: M13 fixes (Caps, URL, 9-11-path) + tests ✅
-- [ ] X-007: SaveService AES-256 stub (Phase 2: HTTP → KMS) ⏸
+- [x] X-007: SaveService AES-256 stub → XOR cipher with IV + secret ✅ (Phase 2: real AES via KMS in Phase 4)
+- [x] M13_Moderation.spec.lua (24 tests covering all branches) ✅
 
-### Wave 3 — UX Polish ✅ PARTIALLY DONE
-- [ ] X-009: Add client controllers (UI hooks + sound triggers)
-- [x] X-014: Per-NPC portraits (emoji icons) ✅
-- [x] Y-002, Y-003, Y-004, Y-005: small fixes ✅
-- [x] Y-009: Apply QuestComplete color in M19 ✅
-- [x] EconomyService race fix (wallet merge + disconnect check) ✅
-- [x] EconomyService VIP auto-expire + AddGems remote + BindToClose ✅
+### Wave 3 — Server-side Wiring ✅ DONE (2026-06-27 21:25)
+- [x] Bootstrap: M20.PurchaseHandler → EconomyService:TryPurchase ✅
+- [x] Bootstrap: M19.OnQuestClicked + OnMoreClicked → QuestDetailRemote ✅
+- [x] Bootstrap: M24.OnSave → SaveService:SaveSetting (with type validation) ✅
+- [x] Bootstrap: M24.OnLanguageChange → Localization.Set + Telemetry ✅
+- [x] Bootstrap: M24.OnAccessibilityChange → Telemetry ✅
+- [x] SaveService: SaveSetting + LoadSettings (separate DataStore prefix) ✅
+- [x] EconomyService: VIP auto-expire + AddGems remote + BindToClose ✅
+- [x] Settings persistence loaded on PlayerAdded → merged with M24.Defaults ✅
 
-### Wave 4 — Premium (1h)
-- [ ] Smooth animations on M18/M19/M20 (slide-in, fade) ✅ partial (M18 done)
-- [x] Settings accessibility actually toggle UI behavior ✅
-- [x] Persist settings to DataStore ✅ (callback hook ready, server wires)
-- [ ] Add tests for UI modules (mock-based) — M17/18/19/20/22/23/24 still 0 tests
+### Wave 4 — UI Test Coverage ✅ DONE (2026-06-27 21:25)
+- [x] M17_HUD.spec.lua (7 it)
+- [x] M18_Dialogue.spec.lua (9 it)
+- [x] M19_QuestTracker.spec.lua (9 it)
+- [x] M20_Shop.spec.lua (8 it)
+- [x] M22_AnimationController.spec.lua (7 it)
+- [x] M23_IntroCamera.spec.lua (8 it)
+- [x] M24_Settings.spec.lua (11 it, incl. 9-language check)
+
+**Total tests: 173 (was 85). UI coverage: 0% → 100% of UI modules.**
 
 ### Wave 5 — Blocked (depends on user)
-- [ ] Asset upload (FBX, sounds, animations)
+- [ ] Asset upload (13 FBX, 6 sounds, 4 animations) — User-Action
 - [ ] Roblox Studio publishing + testing in real Roblox client
 
-### Wave 6 — Server-side wiring
-- [ ] Bootstrap.server: Wire M20.PurchaseHandler → EconomyService:TryPurchase
-- [ ] Bootstrap.server: Wire M19.OnQuestClicked + OnMoreClicked
-- [ ] Bootstrap.server: Wire M24.OnSave → SaveService
-- [ ] Bootstrap.server: Wire M24.OnAccessibilityChange → HUD/UI consumer
+### Wave 6 — Premium Polish (next)
+- [ ] QuestDetail client-side modal (consumes QuestDetailRemote)
+- [ ] Real-Time audio volume propagation from M24 → SoundService
+- [ ] Settings accessibility actually affects UI (ReducedMotion, HighContrast)
+- [ ] Bootstrap-client (currently empty folder): add LocalScript with QuestDetail listener
+- [ ] Smooth slide-in animations on M19/M20 (M18 already done)
+- [ ] Sound-Effekt beim Kauf (M20)
+- [ ] Typewriter-Effekt im M18 Dialog
+- [ ] Address 7 missing items: Boot Animation caller, Boat_Built visibility toggle,
+       Island_Base mesh, MaterialStorage pickup consumer, Workbench quest hook consumer,
+       QuestBoards refresh logic, Lantern_1-4 missing PointLights
 
 ---
 

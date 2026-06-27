@@ -9,7 +9,8 @@
 	2. NPC-Spawn (after Map, before UI)
 	3. Services register themselves
 	4. UI-Controllers spawned for each player on join
-	5. Sound-Controllers started
+	5. Server-side callback wiring (M17/M19/M20/M24 → EconomyService/SaveService)
+	6. Sound-Controllers started
 
 	Failures abort with error() (Fail-Loud-Strategy).
 ]]
@@ -82,7 +83,89 @@ end
 -- ============================================================
 
 local M17_HUD = require(ReplicatedStorage.Shared.Modules.M17_HUD)
+local M18_Dialogue = require(ReplicatedStorage.Shared.Modules.M18_Dialogue)
 local M19_QuestTracker = require(ReplicatedStorage.Shared.Modules.M19_QuestTracker)
+local M20_Shop = require(ReplicatedStorage.Shared.Modules.M20_Shop)
+local M24_Settings = require(ReplicatedStorage.Shared.Modules.M24_Settings)
+local M02_Quest = require(ReplicatedStorage.Shared.Modules.M02_Quest)
+local Localization = require(ReplicatedStorage.Shared.Modules.M15_Localization)
+local M07_Economy = require(ReplicatedStorage.Shared.Modules.M07_Economy)
+
+-- ============================================================
+-- 5. Server-Side Callback-Wiring (UI → Services)
+-- ============================================================
+
+-- M20.Shop: PurchaseHandler → EconomyService:TryPurchase
+M20_Shop.PurchaseHandler = function(player, itemId, item)
+	Log:Info(("[M20.PurchaseHandler] %s versucht %s zu kaufen"):format(player.Name, itemId))
+	-- item hat price_gold/price_robux (lowercase) → M07.ShopItem hat PriceGold/PriceRobux
+	local shopItem = {
+		Id = itemId,
+		Category = "Cosmetic",  -- Default; später aus Item-Katalog
+		PriceGold = item.price_gold,
+		PriceGems = item.price_gems,
+		PriceRobux = item.price_robux,
+		VIPOnly = item.vip_only,
+		ReleasedAt = 0,
+	}
+	return EconomyService:TryPurchase(player, shopItem)
+end
+
+-- M19.QuestTracker: OnQuestClicked + OnMoreClicked
+-- Detail-Modal ist Phase 3 — wir loggen erstmal + senden Client ein "open detail"-Remote
+local questDetailRemote = ReplicatedStorage:FindFirstChild("QuestDetailRemote")
+if not questDetailRemote then
+	questDetailRemote = Instance.new("RemoteEvent")
+	questDetailRemote.Name = "QuestDetailRemote"
+	questDetailRemote.Parent = ReplicatedStorage
+end
+M19_QuestTracker.OnQuestClicked = function(player, questId)
+	Log:Info(("[M19.OnQuestClicked] %s clicked quest %s"):format(player.Name, questId))
+	questDetailRemote:FireClient(player, questId, "show_detail")
+end
+M19_QuestTracker.OnMoreClicked = function(player, total)
+	Log:Info(("[M19.OnMoreClicked] %s wants to see all %d quests"):format(player.Name, total))
+	questDetailRemote:FireClient(player, nil, "show_all")
+end
+
+-- M24.Settings: OnSave → SaveService:SaveSettings (Live-Persistenz)
+M24_Settings.OnSave = function(player, key, value)
+	-- Server-Validation: nur bekannte Keys akzeptieren
+	local allowed = {
+		VolumeMaster = "number", VolumeMusic = "number", VolumeSFX = "number",
+		Language = "string",
+		AnimationsEnabled = "boolean", HighContrast = "boolean",
+		ReducedMotion = "boolean", ChatEnabled = "boolean",
+	}
+	if not allowed[key] then
+		Log:Warn(("[M24] Rejected settings key: %s"):format(key))
+		return
+	end
+	if typeof(value) ~= allowed[key] then
+		Log:Warn(("[M24] Type mismatch for %s: expected %s, got %s"):format(
+			key, allowed[key], typeof(value)))
+		return
+	end
+	SaveService:SaveSetting(player, key, value)
+end
+
+-- M24.Settings: OnLanguageChange → M15 Localization.Set + Telemetry
+M24_Settings.OnLanguageChange = function(player, newLang)
+	Localization:Set(player, newLang)
+	TelemetryService:Track(player, "settings.language_changed", { new_lang = newLang })
+end
+
+-- M24.Settings: OnAccessibilityChange → Telemetry + Live-Apply (HUD/UI consumers)
+M24_Settings.OnAccessibilityChange = function(player, key, value)
+	TelemetryService:Track(player, "settings.accessibility_changed", {
+		key = key, value = value,
+	})
+	-- Phase 3: hier HUD-Refresh, ReducedMotion-Tween-Reducer, HighContrast-Theme
+end
+
+-- ============================================================
+-- 6. Per-Player UI Setup
+-- ============================================================
 
 local function onPlayerAdded(player: Player)
 	-- HUD
@@ -93,9 +176,9 @@ local function onPlayerAdded(player: Player)
 		if economy and economy.GetBalance then
 			local bal = economy:GetBalance(player)
 			if bal then
-				M17_HUD:UpdateCurrency(hud, "Gold", bal.gold or 0)
-				M17_HUD:UpdateCurrency(hud, "Gems", bal.gems or 0)
-				if bal.vipActive then
+				M17_HUD:UpdateCurrency(hud, "Gold", bal.Gold or bal.gold or 0)
+				M17_HUD:UpdateCurrency(hud, "Gems", bal.Gems or bal.gems or 0)
+				if bal.VIPActive or bal.vipActive then
 					M17_HUD:SetVIP(hud, true)
 				end
 			end
@@ -106,6 +189,19 @@ local function onPlayerAdded(player: Player)
 	-- QuestTracker
 	M19_QuestTracker:CreateForPlayer(player)
 	M19_QuestTracker:Update(player, {})
+
+	-- Settings: bei erstem Join laden und auf Defaults anwenden
+	SaveService:LoadSettings(player, function(loadedSettings)
+		if loadedSettings then
+			for k, v in pairs(loadedSettings) do
+				(M24_Settings.Defaults :: any)[k] = v
+			end
+			-- Language aus Settings → Localization übernehmen
+			if loadedSettings.Language then
+				Localization:Set(player, loadedSettings.Language)
+			end
+		end
+	end)
 
 	-- Sound: Auto-Play Ambient wenn Studio / Test-Server läuft
 	spawn(function()
