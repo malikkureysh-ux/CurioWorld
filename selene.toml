@@ -1,8 +1,4 @@
 std = "luau+roblox"
 
-[rules]
-unused_variable = "deny"
-parenthese_conditions = "allow"
-
 [config]
 exclude = ["builds/**"]

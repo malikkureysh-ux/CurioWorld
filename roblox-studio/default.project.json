@@ -54,6 +54,16 @@
         }
       }
     },
+    "SoundService": {
+      "$className": "SoundService",
+      "$properties": {
+        "AmbientReverb": "Hafen",
+        "RespectFilteringEnabled": true,
+        "RolloffScale": 1.0,
+        "DopplerScale": 1.0
+      }
+    },
+    "ReplicatedStorage": {
     "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
       "Shared": {
