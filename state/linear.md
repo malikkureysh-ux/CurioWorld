@@ -527,10 +527,21 @@
 - [x] M03_Dialogue.spec.lua (8 tests) ✅
 - [x] M06_Inventory.spec.lua (15 tests) ✅
 
-**Total tests: 196 (was 173 → +23). Production modules: 6/15 → 9/15 with runtime.**
+### Wave 9 — Phase 3 Completion ✅ DONE (2026-06-27 21:45)
+- [x] M05 Puzzle Engine: Start/Submit/Hint + 3 sample puzzles (CraneTutorial/CraneSelector/ReleaseContainer) ✅
+- [x] M09 Event Framework: Start/End/Contribute + 2 sample events ✅
+- [x] M10 Housing: Place/Remove + VisitorSettings + 20+10 decorations ✅
+- [x] M11 Companion: Unlock/Rename/SetActive/Praise + 4 sample companions ✅
+- [x] QuestService.hasSolvedPuzzle → M05_Puzzle:IsSolved (HH_01/HH_02 completable!) ✅
+- [x] M05_Puzzle.spec.lua (15 tests) ✅
+- [x] M09_Event.spec.lua (12 tests) ✅
+- [x] M10_Housing.spec.lua (12 tests) ✅
+- [x] M11_Companion.spec.lua (14 tests) ✅
+
+**Total tests: 249 (was 196 → +53). Production modules: 9/15 → 13/15 with runtime. M12/M14/M08 still type-only stubs.**
 
 ### Verbleibend (deferred)
-- [ ] Phase-3 Module runtime: M09/M10/M11 (Event/Housing/Companion)
+- [ ] M08 Accessibility (type-only), M12 Animation-Editor, M14 Privacy/Parental-Dashboard (type-only)
 - [ ] AES-256-GCM via KMS (aktuell: XOR-Cipher)
 - [ ] Asset-Upload (13 FBX + 6 Sounds + 4 Animations)
 - [ ] Workbench quest hook consumer

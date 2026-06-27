@@ -25,6 +25,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Log = require(ReplicatedStorage.Shared.Util.Log)
 local M02_Quest = require(ReplicatedStorage.Shared.Modules.M02_Quest)
 local M06_Inventory = require(ReplicatedStorage.Shared.Modules.M06_Inventory)
+local M05_Puzzle = require(ReplicatedStorage.Shared.Modules.M05_Puzzle)
 local TelemetryService = require(ServerScriptService.Services.TelemetryService)
 local ServiceRegistry = require(ReplicatedStorage.Shared.Util.ServiceRegistry)
 
@@ -76,9 +77,8 @@ local function buildWorldServices(): M02_Quest.WorldServices
 			return false
 		end,
 		isInZone = isInZone,
-		hasSolvedPuzzle = function(_player, _puzzleId)
-			-- Phase 3: Puzzle-Service-Integration
-			return false
+		hasSolvedPuzzle = function(player, puzzleId)
+			return M05_Puzzle:IsSolved(player, puzzleId)
 		end,
 		hasBuilt = function(_player, _buildId)
 			return false
