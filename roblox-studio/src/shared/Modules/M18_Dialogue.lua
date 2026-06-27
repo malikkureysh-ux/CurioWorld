@@ -42,6 +42,15 @@ M18_Dialogue.Theme = {
 	TweenDuration = 0.25,
 }
 
+-- Per-NPC-Portrait-Icons (statt ein Smiley für alle)
+M18_Dialogue.PortraitIcons = {
+	Hafenwirtin = "👩‍🍳",
+	Yuki        = "🧝‍♀️",
+	Maja        = "👩‍🔧",
+	Nils        = "🧔",
+	Default     = "😊",
+}
+
 local function makeUICorner(parent, radius)
 	local c = Instance.new("UICorner")
 	c.CornerRadius = radius or M18_Dialogue.Theme.ModalCornerRadius
@@ -54,7 +63,8 @@ end
 
 function M18_Dialogue:Show(player: Player, npcConfig: { [string]: any },
                             dialogueText: string,
-                            options: { { text: string, responseKey: string } }?)
+                            options: { { text: string, responseKey: string } }?,
+                            onOptionSelected: ((responseKey: string, optionIndex: number) -> ())?)
 	local playerGui = player:FindFirstChild("PlayerGui")
 	if not playerGui then return end
 
@@ -105,15 +115,25 @@ function M18_Dialogue:Show(player: Player, npcConfig: { [string]: any },
 	portrait.Parent = modal
 	makeUICorner(portrait, UDim.new(0, 12))
 
-	-- Portrait-Smiley
+	-- Portrait-Smiley (per-NPC, mit Glow-Ring via UIStroke)
+	local portraitIcon = M18_Dialogue.PortraitIcons[npcConfig.NpcId or ""]
+		or M18_Dialogue.PortraitIcons.Default
 	local face = Instance.new("TextLabel")
 	face.Size = UDim2.new(1, 0, 1, 0)
 	face.BackgroundTransparency = 1
 	face.Font = Enum.Font.GothamBold
 	face.TextSize = 60
 	face.TextColor3 = Color3.fromRGB(255, 255, 255)
-	face.Text = "😊"
+	face.Text = portraitIcon
 	face.Parent = portrait
+
+	-- Glow-Ring (Premium-Polish): UIStroke um Portrait
+	local portraitStroke = Instance.new("UIStroke")
+	portraitStroke.Name = "Glow"
+	portraitStroke.Color = Color3.fromRGB(255, 240, 180)  -- warm Glow
+	portraitStroke.Thickness = 3
+	portraitStroke.Transparency = 0.2
+	portraitStroke.Parent = portrait
 
 	-- NPC-Name (oben rechts vom Portrait)
 	local nameLabel = Instance.new("TextLabel")
@@ -202,8 +222,27 @@ function M18_Dialogue:Show(player: Player, npcConfig: { [string]: any },
 					TweenInfo.new(M18_Dialogue.Theme.TweenDuration),
 					{ BackgroundColor3 = M18_Dialogue.Theme.OptionSelected }):Play()
 				Log:Info("[M18] Selected option: " .. tostring(opt.responseKey))
-				-- TODO Phase 3: callback an Quest-Engine weiterleiten
-				screenGui:Destroy()
+
+				-- Forward to Quest-Engine / Dialog-Logic
+				if onOptionSelected then
+					local ok, err = pcall(onOptionSelected, opt.responseKey, i)
+					if not ok then
+						Log:Warn("[M18] onOptionSelected callback failed: " .. tostring(err))
+					end
+				end
+
+				-- Slide-out animation
+				local slideOut = TweenService:Create(modal,
+					TweenInfo.new(M18_Dialogue.Theme.TweenDuration,
+						Enum.EasingStyle.Back,
+						Enum.EasingDirection.In),
+					{ Position = UDim2.new(0.15, 0, 1.2, 0) })
+				slideOut:Play()
+				slideOut.Completed:Connect(function()
+					if screenGui and screenGui.Parent then
+						screenGui:Destroy()
+					end
+				end)
 			end)
 		end
 	else

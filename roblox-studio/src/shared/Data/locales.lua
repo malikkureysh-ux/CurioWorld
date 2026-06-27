@@ -57,6 +57,20 @@ Locales.de = {
 
 	-- Compliance
 	["compliance.under_13_notice"] = "Du bist unter 13 — Käufe benötigen die Zustimmung deiner Eltern.",
+
+	-- Settings
+	["ui.settings.title"]              = "Einstellungen",
+	["ui.settings.audio"]              = "Audio",
+	["ui.settings.volume_master"]      = "Master-Lautstärke",
+	["ui.settings.volume_music"]       = "Musik-Lautstärke",
+	["ui.settings.volume_sfx"]         = "SFX-Lautstärke",
+	["ui.settings.language"]           = "Sprache",
+	["ui.settings.lang_label"]         = "Anzeigesprache",
+	["ui.settings.accessibility"]      = "Barrierefreiheit",
+	["ui.settings.animations_enabled"] = "Animationen aktiv",
+	["ui.settings.high_contrast"]      = "Hoher Kontrast",
+	["ui.settings.reduced_motion"]     = "Reduzierte Bewegung",
+	["ui.settings.save_apply"]         = "Speichern",
 }
 
 Locales.en = {
@@ -86,19 +100,33 @@ Locales.en = {
 	["district.moon_bazaar.name"]     = "Moon Bazaar",
 	["district.moon_bazaar.tagline"]  = "Spices, stars, stories.",
 
-	["npc.hafenwirtin.greeting"]    = "Hi! I'm Mira. Need help with a quest?",
+	["npc.hafenwirtin.greeting"]    = "Hi! I'm Lina. Need help with a quest?",
 	["npc.yuki.greeting"]    = "Traveling merchants come and go. Browse my wares!",
 	["npc.maja.greeting"] = "Boats need wood, sails, and patience. Want to help?",
 	["npc.nils.greeting"] = "From up here, you can see the whole harbor. Beautiful, isn't it?",
 
 	["quest.hh_01.title"]       = "The First Crane",
-	["quest.hh_01.description"] = "Mira wants to show you how the harbor cranes work.",
+	["quest.hh_01.description"] = "Lina wants to show you how the harbor cranes work.",
 	["quest.hh_02.title"]       = "Lift the Cargo",
 	["quest.hh_02.description"] = "Use a crane to move a container from one dock to another.",
 	["quest.hh_03.title"]       = "Build a Boat Together",
 	["quest.hh_03.description"] = "The shipyard needs hands. Gather materials and help build a small boat.",
 
 	["compliance.under_13_notice"] = "You're under 13 — purchases need a parent's okay.",
+
+	-- Settings
+	["ui.settings.title"]              = "Settings",
+	["ui.settings.audio"]              = "Audio",
+	["ui.settings.volume_master"]      = "Master Volume",
+	["ui.settings.volume_music"]       = "Music Volume",
+	["ui.settings.volume_sfx"]         = "SFX Volume",
+	["ui.settings.language"]           = "Language",
+	["ui.settings.lang_label"]         = "Display Language",
+	["ui.settings.accessibility"]      = "Accessibility",
+	["ui.settings.animations_enabled"] = "Animations On",
+	["ui.settings.high_contrast"]      = "High Contrast",
+	["ui.settings.reduced_motion"]     = "Reduced Motion",
+	["ui.settings.save_apply"]         = "Apply",
 }
 
 -- ============================================================
@@ -132,19 +160,33 @@ Locales.es = {
 	["district.moon_bazaar.name"]     = "Bazar Luna",
 	["district.moon_bazaar.tagline"]  = "Especias, estrellas, historias.",
 
-	["npc.hafenwirtin.greeting"]    = "¡Hola! Soy Mira. ¿Necesitas ayuda con una misión?",
+	["npc.hafenwirtin.greeting"]    = "¡Hola! Soy Lina. ¿Necesitas ayuda con una misión?",
 	["npc.yuki.greeting"]    = "Los mercaderes viajeros van y vienen. ¡Mira mis productos!",
 	["npc.maja.greeting"] = "Los barcos necesitan madera, velas y paciencia. ¿Quieres ayudar?",
 	["npc.nils.greeting"] = "Desde aquí arriba se ve todo el puerto. ¿Hermoso, verdad?",
 
 	["quest.hh_01.title"]       = "La Primera Grúa",
-	["quest.hh_01.description"] = "Mira quiere enseñarte cómo funcionan las grúas del puerto.",
+	["quest.hh_01.description"] = "Lina quiere enseñarte cómo funcionan las grúas del puerto.",
 	["quest.hh_02.title"]       = "Eleva la Carga",
 	["quest.hh_02.description"] = "Usa una grúa para mover un contenedor de un muelle a otro.",
 	["quest.hh_03.title"]       = "Construye un Barco Juntos",
 	["quest.hh_03.description"] = "El astillero necesita manos. Reúne materiales y ayuda a construir un pequeño barco.",
 
 	["compliance.under_13_notice"] = "Eres menor de 13 años — las compras necesitan el permiso de tus padres.",
+
+	-- Settings
+	["ui.settings.title"]              = "Ajustes",
+	["ui.settings.audio"]              = "Audio",
+	["ui.settings.volume_master"]      = "Volumen Maestro",
+	["ui.settings.volume_music"]       = "Volumen Música",
+	["ui.settings.volume_sfx"]         = "Volumen Efectos",
+	["ui.settings.language"]           = "Idioma",
+	["ui.settings.lang_label"]         = "Idioma de visualización",
+	["ui.settings.accessibility"]      = "Accesibilidad",
+	["ui.settings.animations_enabled"] = "Animaciones activas",
+	["ui.settings.high_contrast"]      = "Alto contraste",
+	["ui.settings.reduced_motion"]     = "Movimiento reducido",
+	["ui.settings.save_apply"]         = "Aplicar",
 }
 
 -- ============================================================
@@ -178,19 +220,33 @@ Locales.fr = {
 	["district.moon_bazaar.name"]     = "Bazar Lune",
 	["district.moon_bazaar.tagline"]  = "Épices, étoiles, histoires.",
 
-	["npc.hafenwirtin.greeting"]    = "Salut ! Je suis Mira. Tu as besoin d'aide pour une quête ?",
+["npc.hafenwirtin.greeting"]    = "Salut ! Je suis Lina. Tu as besoin d'aide pour une quête ?",
 	["npc.yuki.greeting"]    = "Les marchands voyageurs vont et viennent. Regarde mes marchandises !",
 	["npc.maja.greeting"] = "Les bateaux ont besoin de bois, de voiles et de patience. Tu veux aider ?",
 	["npc.nils.greeting"] = "D'ici, on voit tout le port. Magnifique, n'est-ce pas ?",
 
-	["quest.hh_01.title"]       = "La Première Grue",
-	["quest.hh_01.description"] = "Mira veut te montrer comment fonctionnent les grues du port.",
+	["quest.hh_01.title"]       = "La Première Grée",
+	["quest.hh_01.description"] = "Lina veut te montrer comment fonctionnent les grues du port.",
 	["quest.hh_02.title"]       = "Soulève la Cargaison",
 	["quest.hh_02.description"] = "Utilise une grue pour déplacer un conteneur d'un quai à l'autre.",
 	["quest.hh_03.title"]       = "Construisez un Bateau Ensemble",
 	["quest.hh_03.description"] = "Le chantier naval a besoin de bras. Rassemble des matériaux et aide à construire un petit bateau.",
 
 	["compliance.under_13_notice"] = "Tu as moins de 13 ans — les achats nécessitent l'accord de tes parents.",
+
+	-- Settings
+	["ui.settings.title"]              = "Paramètres",
+	["ui.settings.audio"]              = "Audio",
+	["ui.settings.volume_master"]      = "Volume principal",
+	["ui.settings.volume_music"]       = "Volume musique",
+	["ui.settings.volume_sfx"]         = "Volume effets",
+	["ui.settings.language"]           = "Langue",
+	["ui.settings.lang_label"]         = "Langue d'affichage",
+	["ui.settings.accessibility"]      = "Accessibilité",
+	["ui.settings.animations_enabled"] = "Animations actives",
+	["ui.settings.high_contrast"]      = "Contraste élevé",
+	["ui.settings.reduced_motion"]     = "Mouvement réduit",
+	["ui.settings.save_apply"]         = "Appliquer",
 }
 
 -- ============================================================
@@ -224,19 +280,33 @@ Locales.tr = {
 	["district.moon_bazaar.name"]     = "Ay Pazarı",
 	["district.moon_bazaar.tagline"]  = "Baharatlar, yıldızlar, hikâyeler.",
 
-	["npc.hafenwirtin.greeting"]    = "Merhaba! Ben Mira. Bir görev için yardıma ihtiyacın var mı?",
+	["npc.hafenwirtin.greeting"]    = "Merhaba! Ben Lina. Bir görev için yardıma ihtiyacın var mı?",
 	["npc.yuki.greeting"]    = "Gezgin tüccarlar gelir ve gider. Mallarıma bir bak!",
 	["npc.maja.greeting"] = "Gemiler tahtaya, yelkenlere ve sabıra ihtiyaç duyar. Yardım eder misin?",
 	["npc.nils.greeting"] = "Buradan tüm limanı görebilirsin. Güzel, değil mi?",
 
 	["quest.hh_01.title"]       = "İlk Vinç",
-	["quest.hh_01.description"] = "Mira sana liman vinçlerinin nasıl çalıştığını göstermek istiyor.",
+	["quest.hh_01.description"] = "Lina sana liman vinçlerinin nasıl çalıştığını göstermek istiyor.",
 	["quest.hh_02.title"]       = "Yükü Kaldır",
 	["quest.hh_02.description"] = "Bir konteyneri bir iskeleden diğerine taşımak için vinç kullan.",
 	["quest.hh_03.title"]       = "Birlikte Bir Tekne Yapın",
 	["quest.hh_03.description"] = "Tersaneye eleman lazım. Malzeme topla ve küçük bir tekne yapımına yardım et.",
 
 	["compliance.under_13_notice"] = "13 yaşından küçüksün — satın alımlar için ebeveyn onayı gerekir.",
+
+	-- Settings
+	["ui.settings.title"]              = "Ayarlar",
+	["ui.settings.audio"]              = "Ses",
+	["ui.settings.volume_master"]      = "Ana Ses",
+	["ui.settings.volume_music"]       = "Müzik Sesi",
+	["ui.settings.volume_sfx"]         = "Efekt Sesi",
+	["ui.settings.language"]           = "Dil",
+	["ui.settings.lang_label"]         = "Görüntüleme Dili",
+	["ui.settings.accessibility"]      = "Erişilebilirlik",
+	["ui.settings.animations_enabled"] = "Animasyonlar Açık",
+	["ui.settings.high_contrast"]      = "Yüksek Kontrast",
+	["ui.settings.reduced_motion"]     = "Azaltılmış Hareket",
+	["ui.settings.save_apply"]         = "Uygula",
 }
 
 -- ============================================================
@@ -270,19 +340,33 @@ Locales.hi = {
 	["district.moon_bazaar.name"]     = "चाँद बाज़ार",
 	["district.moon_bazaar.tagline"]  = "मसाले, सितारे, कहानियाँ।",
 
-	["npc.hafenwirtin.greeting"]    = "नमस्ते! मैं मीरा हूँ। क्या आपको किसी खोज में मदद चाहिए?",
+	["npc.hafenwirtin.greeting"]    = "नमस्ते! मैं लीना हूँ। क्या आपको किसी खोज में मदद चाहिए?",
 	["npc.yuki.greeting"]    = "यात्रा करने वाले व्यापारी आते-जाते रहते हैं। मेरा सामान देखें!",
 	["npc.maja.greeting"] = "नावों को लकड़ी, पाल और धैर्य चाहिए। क्या आप मदद करेंगे?",
 	["npc.nils.greeting"] = "यहाँ से पूरा बंदरगाह दिखता है। सुंदर है, है ना?",
 
 	["quest.hh_01.title"]       = "पहली क्रेन",
-	["quest.hh_01.description"] = "मीरा आपको बंदरगाह की क्रेनों का काम दिखाना चाहती है।",
+	["quest.hh_01.description"] = "लीना आपको बंदरगाह की क्रेनों का काम दिखाना चाहती है।",
 	["quest.hh_02.title"]       = "माल उठाओ",
 	["quest.hh_02.description"] = "एक कंटेनर को एक घाट से दूसरे घाट तक ले जाने के लिए क्रेन का उपयोग करें।",
 	["quest.hh_03.title"]       = "मिलकर एक नाव बनाएँ",
 	["quest.hh_03.description"] = "जहाज़घर को हाथों की ज़रूरत है। सामग्री इकट्ठा करें और एक छोटी नाव बनाने में मदद करें।",
 
 	["compliance.under_13_notice"] = "आप 13 साल से कम हैं — खरीदारी के लिए माता-पिता की अनुमति चाहिए।",
+
+	-- Settings
+	["ui.settings.title"]              = "सेटिंग्स",
+	["ui.settings.audio"]              = "ऑडियो",
+	["ui.settings.volume_master"]      = "मुख्य आवाज़",
+	["ui.settings.volume_music"]       = "संगीत आवाज़",
+	["ui.settings.volume_sfx"]         = "प्रभाव आवाज़",
+	["ui.settings.language"]           = "भाषा",
+	["ui.settings.lang_label"]         = "प्रदर्शन भाषा",
+	["ui.settings.accessibility"]      = "पहुँच",
+	["ui.settings.animations_enabled"] = "एनिमेशन चालू",
+	["ui.settings.high_contrast"]      = "उच्च कंट्रास्ट",
+	["ui.settings.reduced_motion"]     = "कम गति",
+	["ui.settings.save_apply"]         = "लागू करें",
 }
 
 -- ============================================================
@@ -316,19 +400,33 @@ Locales.zh = {
 	["district.moon_bazaar.name"]     = "月亮集市",
 	["district.moon_bazaar.tagline"]  = "香料、星辰、故事。",
 
-	["npc.hafenwirtin.greeting"]    = "你好！我是米拉。需要任务帮助吗？",
+	["npc.hafenwirtin.greeting"]    = "你好！我是莉娜。需要任务帮助吗？",
 	["npc.yuki.greeting"]    = "旅行商人来来去去。看看我的商品！",
 	["npc.maja.greeting"] = "船只需要木材、风帆和耐心。你想帮忙吗？",
 	["npc.nils.greeting"] = "从这儿能看到整个港口。美丽，对吧？",
 
 	["quest.hh_01.title"]       = "第一台起重机",
-	["quest.hh_01.description"] = "米拉想给你展示港口起重机是怎么工作的。",
+	["quest.hh_01.description"] = "莉娜想给你展示港口起重机是怎么工作的。",
 	["quest.hh_02.title"]       = "吊起货物",
 	["quest.hh_02.description"] = "用起重机把一个集装箱从一个码头搬到另一个。",
 	["quest.hh_03.title"]       = "一起造船",
 	["quest.hh_03.description"] = "造船厂需要帮手。收集材料，帮着造一艘小船。",
 
 	["compliance.under_13_notice"] = "你未满 13 岁——购买需要家长同意。",
+
+	-- Settings
+	["ui.settings.title"]              = "设置",
+	["ui.settings.audio"]              = "音频",
+	["ui.settings.volume_master"]      = "主音量",
+	["ui.settings.volume_music"]       = "音乐音量",
+	["ui.settings.volume_sfx"]         = "音效音量",
+	["ui.settings.language"]           = "语言",
+	["ui.settings.lang_label"]         = "显示语言",
+	["ui.settings.accessibility"]      = "无障碍",
+	["ui.settings.animations_enabled"] = "启用动画",
+	["ui.settings.high_contrast"]      = "高对比度",
+	["ui.settings.reduced_motion"]     = "减少动态",
+	["ui.settings.save_apply"]         = "应用",
 }
 
 -- ============================================================
@@ -362,19 +460,33 @@ Locales.ja = {
 	["district.moon_bazaar.name"]     = "ムーン・バザール",
 	["district.moon_bazaar.tagline"]  = "スパイス、星、物語。",
 
-	["npc.hafenwirtin.greeting"]    = "こんにちは！ミラです。クエストで助けが必要？",
+	["npc.hafenwirtin.greeting"]    = "こんにちは！リナです。クエストで助けが必要？",
 	["npc.yuki.greeting"]    = "旅する商人たちは来ては去っていく。俺の品を見てくれ！",
 	["npc.maja.greeting"] = "船には木と帆と忍耐がいる。手伝えるか？",
 	["npc.nils.greeting"] = "ここからは港全体が見える。美しいだろ？",
 
 	["quest.hh_01.title"]       = "初めてのクレーン",
-	["quest.hh_01.description"] = "ミラが港のクレーンの動かし方を見せてくれる。",
+	["quest.hh_01.description"] = "リナが港のクレーンの動かし方を見せてくれる。",
 	["quest.hh_02.title"]       = "貨物を持ち上げろ",
 	["quest.hh_02.description"] = "クレーンを使ってコンテナをある桟橋から別の桟橋へ運べ。",
 	["quest.hh_03.title"]       = "一緒に船を造ろう",
 	["quest.hh_03.description"] = "造船所には人手が必要だ。材料を集め、小さな船の建造を手伝え。",
 
 	["compliance.under_13_notice"] = "13歳未満です — 購入には保護者の同意が必要です。",
+
+	-- Settings
+	["ui.settings.title"]              = "設定",
+	["ui.settings.audio"]              = "オーディオ",
+	["ui.settings.volume_master"]      = "マスター音量",
+	["ui.settings.volume_music"]       = "音楽音量",
+	["ui.settings.volume_sfx"]         = "効果音音量",
+	["ui.settings.language"]           = "言語",
+	["ui.settings.lang_label"]         = "表示言語",
+	["ui.settings.accessibility"]      = "アクセシビリティ",
+	["ui.settings.animations_enabled"] = "アニメーションON",
+	["ui.settings.high_contrast"]      = "ハイコントラスト",
+	["ui.settings.reduced_motion"]     = "モーション軽減",
+	["ui.settings.save_apply"]         = "適用",
 }
 
 -- ============================================================
@@ -408,19 +520,33 @@ Locales.ar = {
 	["district.moon_bazaar.name"]     = "بازار القمر",
 	["district.moon_bazaar.tagline"]  = "توابل، نجوم، حكايات.",
 
-	["npc.hafenwirtin.greeting"]    = "مرحباً! أنا ميرا. هل تحتاج مساعدة في مهمة؟",
+	["npc.hafenwirtin.greeting"]    = "مرحباً! أنا لينا. هل تحتاج مساعدة في مهمة؟",
 	["npc.yuki.greeting"]    = "التجار المسافرون يأتون ويذهبون. تصفح بضاعتي!",
 	["npc.maja.greeting"] = "القوارب تحتاج خشباً وأشرعة وصبراً. هل تساعد؟",
 	["npc.nils.greeting"] = "من هنا يمكنك رؤية الميناء كله. أليس جميلاً؟",
 
 	["quest.hh_01.title"]       = "الرافعة الأولى",
-	["quest.hh_01.description"] = "ميرا تريد أن تُريك كيف تعمل رافعات الميناء.",
+	["quest.hh_01.description"] = "لينا تريد أن تُريك كيف تعمل رافعات الميناء.",
 	["quest.hh_02.title"]       = "ارفع الشحنة",
 	["quest.hh_02.description"] = "استخدم رافعة لنقل حاوية من رصيف إلى آخر.",
 	["quest.hh_03.title"]       = "ابني قارباً معاً",
 	["quest.hh_03.description"] = "حوض السفن يحتاج أيادي. اجمع المواد وساعد في بناء قارب صغير.",
 
 	["compliance.under_13_notice"] = "عمرك أقل من 13 سنة — الشراء يحتاج موافقة والديك.",
+
+	-- Settings
+	["ui.settings.title"]              = "الإعدادات",
+	["ui.settings.audio"]              = "الصوت",
+	["ui.settings.volume_master"]      = "مستوى الصوت الرئيسي",
+	["ui.settings.volume_music"]       = "مستوى الموسيقى",
+	["ui.settings.volume_sfx"]         = "مستوى المؤثرات",
+	["ui.settings.language"]           = "اللغة",
+	["ui.settings.lang_label"]         = "لغة العرض",
+	["ui.settings.accessibility"]      = "إمكانية الوصول",
+	["ui.settings.animations_enabled"] = "الرسوم المتحركة مفعّلة",
+	["ui.settings.high_contrast"]      = "تباين عالٍ",
+	["ui.settings.reduced_motion"]     = "تقليل الحركة",
+	["ui.settings.save_apply"]         = "تطبيق",
 }
 
 return Locales

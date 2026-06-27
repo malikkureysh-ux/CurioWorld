@@ -47,6 +47,18 @@ M24_Settings.Defaults = {
 	ChatEnabled = true,
 }
 
+-- Optional save-callback (server-side persistence)
+-- Signature: (player, key, value) -> ()
+M24_Settings.OnSave = nil
+
+-- Optional language-change-callback
+-- Signature: (player, newLang) -> ()
+M24_Settings.OnLanguageChange = nil
+
+-- Optional accessibility-toggle-callback
+-- Signature: (player, key, value) -> ()
+M24_Settings.OnAccessibilityChange = nil
+
 -- ============================================================
 -- UI-Builder Helpers
 -- ============================================================
@@ -57,7 +69,7 @@ local function makeUICorner(parent, radius)
 	c.Parent = parent
 end
 
-local function makeSlider(parent, label, initialValue, callback)
+local function makeSlider(parent, label, initialValue, callback, ownerCleanup)
 	-- Frame mit Label + Slider-Track + Slider-Fill
 	local container = Instance.new("Frame")
 	container.Size = UDim2.new(1, 0, 0, 50)
@@ -110,23 +122,46 @@ local function makeSlider(parent, label, initialValue, callback)
 	valueLabel.Text = tostring(math.floor(initialValue * 100)) .. "%"
 	valueLabel.Parent = container
 
-	-- Drag-Logik (vereinfacht: bei Click → Knob-Position)
+	-- Drag-Logik: Connections werden getrackt, damit sie bei Cleanup disconnecten
+	local connections: { RBXScriptConnection } = {}
+
+	local function cleanupConnections()
+		for _, conn in ipairs(connections) do
+			if conn and conn.Connected then conn:Disconnect() end
+		end
+		table.clear(connections)
+	end
+
+	if ownerCleanup then
+		table.insert(ownerCleanup, cleanupConnections)
+	end
+
 	track.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1
 			or input.UserInputType == Enum.UserInputType.Touch then
 			local mouse = Players.LocalPlayer:GetMouse()
 			local updateValue
 			updateValue = function()
-				local relX = math.clamp((mouse.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
+				local relX = math.clamp(
+					(mouse.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
 				TweenService:Create(fill, TweenInfo.new(0.1),
-				                    { Size = UDim2.new(relX, 0, 1, 0) }):Play()
+					{ Size = UDim2.new(relX, 0, 1, 0) }):Play()
 				TweenService:Create(knob, TweenInfo.new(0.1),
-				                    { Position = UDim2.new(relX, -8, 0.5, -8) }):Play()
+					{ Position = UDim2.new(relX, -8, 0.5, -8) }):Play()
 				valueLabel.Text = tostring(math.floor(relX * 100)) .. "%"
 				if callback then callback(relX) end
 			end
 			updateValue()
-			mouse.Move:Connect(function() updateValue() end)
+			-- Move-Listener: tracked, disconnectet bei InputEnded oder Cleanup
+			local moveConn = mouse.Move:Connect(function() updateValue() end)
+			table.insert(connections, moveConn)
+
+			local releaseConn
+			releaseConn = mouse.Button1Up:Connect(function()
+				if moveConn and moveConn.Connected then moveConn:Disconnect() end
+				if releaseConn and releaseConn.Connected then releaseConn:Disconnect() end
+			end)
+			table.insert(connections, releaseConn)
 		end
 	end)
 
@@ -242,6 +277,16 @@ function M24_Settings:Show(player: Player)
 	screenGui.DisplayOrder = 120
 	screenGui.Parent = playerGui
 
+	-- Cleanup-Tracker für alle Slider-Connections (memory-leak fix)
+	local cleanups: { () -> () } = {}
+	local function runCleanups()
+		for _, fn in ipairs(cleanups) do
+			local ok, err = pcall(fn)
+			if not ok then Log:Warn("[M24] cleanup failed: " .. tostring(err)) end
+		end
+		table.clear(cleanups)
+	end
+
 	-- Backdrop
 	local backdrop = Instance.new("Frame")
 	backdrop.Size = UDim2.new(1, 0, 1, 0)
@@ -260,20 +305,21 @@ function M24_Settings:Show(player: Player)
 	modal.Parent = screenGui
 	makeUICorner(modal, UDim.new(0, 16))
 
-	-- Header
+	-- Header (Localized)
+	local Localization = ReplicatedStorage.Shared.Modules.M15_Localization
 	local header = Instance.new("TextLabel")
 	header.Size = UDim2.new(1, 0, 0, 50)
 	header.BackgroundTransparency = 1
 	header.Font = Enum.Font.GothamBold
 	header.TextSize = 24
 	header.TextColor3 = M24_Settings.Theme.TextColor
-	header.Text = "⚙️ Einstellungen"
+	header.Text = Localization:GetString(player, "ui.settings.title", {})
 	header.Parent = modal
 
 	-- Close-Button
 	local closeBtn = Instance.new("TextButton")
-	closeBtn.Size = UDim2.new(0, 40, 0, 40)
-	closeBtn.Position = UDim2.new(1, -50, 0, 5)
+	closeBtn.Size = UDim2.new(0, 44, 0, 44)  -- WCAG: ≥ 44×44
+	closeBtn.Position = UDim2.new(1, -52, 0, 5)
 	closeBtn.BackgroundColor3 = Color3.fromRGB(180, 60, 60)
 	closeBtn.BorderSizePixel = 0
 	closeBtn.Font = Enum.Font.GothamBold
@@ -284,7 +330,7 @@ function M24_Settings:Show(player: Player)
 	makeUICorner(closeBtn)
 	closeBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
 
-	-- Sections-Container (Scrollable in Phase 3)
+	-- Sections-Container (Scrollable)
 	local sections = Instance.new("ScrollingFrame")
 	sections.Name = "Sections"
 	sections.Size = UDim2.new(1, -32, 1, -70)
@@ -307,21 +353,42 @@ function M24_Settings:Show(player: Player)
 	audioSection.TextSize = 16
 	audioSection.TextColor3 = M24_Settings.Theme.Primary
 	audioSection.TextXAlignment = Enum.TextXAlignment.Left
-	audioSection.Text = "🔊 Audio"
+	audioSection.Text = Localization:GetString(player, "ui.settings.audio", {})
 	audioSection.LayoutOrder = 1
 	audioSection.Parent = sections
 
-	makeSlider(sections, "Master-Lautstärke",
+	makeSlider(sections,
+		Localization:GetString(player, "ui.settings.volume_master", {}),
 		M24_Settings.Defaults.VolumeMaster,
-		function(v) M24_Settings.Defaults.VolumeMaster = v end).LayoutOrder = 2
+		function(v)
+			M24_Settings.Defaults.VolumeMaster = v
+			if M24_Settings.OnSave then
+				pcall(M24_Settings.OnSave, player, "VolumeMaster", v)
+			end
+		end,
+		cleanups).LayoutOrder = 2
 
-	makeSlider(sections, "Musik-Lautstärke",
+	makeSlider(sections,
+		Localization:GetString(player, "ui.settings.volume_music", {}),
 		M24_Settings.Defaults.VolumeMusic,
-		function(v) M24_Settings.Defaults.VolumeMusic = v end).LayoutOrder = 3
+		function(v)
+			M24_Settings.Defaults.VolumeMusic = v
+			if M24_Settings.OnSave then
+				pcall(M24_Settings.OnSave, player, "VolumeMusic", v)
+			end
+		end,
+		cleanups).LayoutOrder = 3
 
-	makeSlider(sections, "SFX-Lautstärke",
+	makeSlider(sections,
+		Localization:GetString(player, "ui.settings.volume_sfx", {}),
 		M24_Settings.Defaults.VolumeSFX,
-		function(v) M24_Settings.Defaults.VolumeSFX = v end).LayoutOrder = 4
+		function(v)
+			M24_Settings.Defaults.VolumeSFX = v
+			if M24_Settings.OnSave then
+				pcall(M24_Settings.OnSave, player, "VolumeSFX", v)
+			end
+		end,
+		cleanups).LayoutOrder = 4
 
 	-- Language-Section
 	local langSection = Instance.new("TextLabel")
@@ -331,14 +398,30 @@ function M24_Settings:Show(player: Player)
 	langSection.TextSize = 16
 	langSection.TextColor3 = M24_Settings.Theme.Primary
 	langSection.TextXAlignment = Enum.TextXAlignment.Left
-	langSection.Text = "🌍 Sprache"
+	langSection.Text = Localization:GetString(player, "ui.settings.language", {})
 	langSection.LayoutOrder = 5
 	langSection.Parent = sections
 
-	makeDropdown(sections, "Anzeigesprache",
+	makeDropdown(sections,
+		Localization:GetString(player, "ui.settings.lang_label", {}),
 		{ "de", "en", "es", "fr", "tr", "hi", "zh", "ja", "ar" },
 		M24_Settings.Defaults.Language,
-		function(v) M24_Settings.Defaults.Language = v end).LayoutOrder = 6
+		function(v)
+			M24_Settings.Defaults.Language = v
+			-- Live wire to Localization module
+			local ok, err = pcall(Localization.Set, Localization, player, v)
+			if ok then
+				Log:Info("[M24] Language changed: " .. v)
+			else
+				Log:Warn("[M24] Localization.Set failed: " .. tostring(err))
+			end
+			if M24_Settings.OnLanguageChange then
+				pcall(M24_Settings.OnLanguageChange, player, v)
+			end
+			if M24_Settings.OnSave then
+				pcall(M24_Settings.OnSave, player, "Language", v)
+			end
+		end).LayoutOrder = 6
 
 	-- Accessibility-Section
 	local accSection = Instance.new("TextLabel")
@@ -348,23 +431,55 @@ function M24_Settings:Show(player: Player)
 	accSection.TextSize = 16
 	accSection.TextColor3 = M24_Settings.Theme.Primary
 	accSection.TextXAlignment = Enum.TextXAlignment.Left
-	accSection.Text = "♿ Barrierefreiheit"
+	accSection.Text = Localization:GetString(player, "ui.settings.accessibility", {})
 	accSection.LayoutOrder = 7
 	accSection.Parent = sections
 
-	makeToggle(sections, "Animationen aktiv",
+	makeToggle(sections,
+		Localization:GetString(player, "ui.settings.animations_enabled", {}),
 		M24_Settings.Defaults.AnimationsEnabled,
-		function(v) M24_Settings.Defaults.AnimationsEnabled = v end).LayoutOrder = 8
+		function(v)
+			M24_Settings.Defaults.AnimationsEnabled = v
+			if M24_Settings.OnAccessibilityChange then
+				pcall(M24_Settings.OnAccessibilityChange, player, "AnimationsEnabled", v)
+			end
+			if M24_Settings.OnSave then
+				pcall(M24_Settings.OnSave, player, "AnimationsEnabled", v)
+			end
+		end).LayoutOrder = 8
 
-	makeToggle(sections, "Hoher Kontrast",
+	makeToggle(sections,
+		Localization:GetString(player, "ui.settings.high_contrast", {}),
 		M24_Settings.Defaults.HighContrast,
-		function(v) M24_Settings.Defaults.HighContrast = v end).LayoutOrder = 9
+		function(v)
+			M24_Settings.Defaults.HighContrast = v
+			if M24_Settings.OnAccessibilityChange then
+				pcall(M24_Settings.OnAccessibilityChange, player, "HighContrast", v)
+			end
+			if M24_Settings.OnSave then
+				pcall(M24_Settings.OnSave, player, "HighContrast", v)
+			end
+		end).LayoutOrder = 9
 
-	makeToggle(sections, "Reduzierte Bewegung",
+	makeToggle(sections,
+		Localization:GetString(player, "ui.settings.reduced_motion", {}),
 		M24_Settings.Defaults.ReducedMotion,
-		function(v) M24_Settings.Defaults.ReducedMotion = v end).LayoutOrder = 10
+		function(v)
+			M24_Settings.Defaults.ReducedMotion = v
+			if M24_Settings.OnAccessibilityChange then
+				pcall(M24_Settings.OnAccessibilityChange, player, "ReducedMotion", v)
+			end
+			if M24_Settings.OnSave then
+				pcall(M24_Settings.OnSave, player, "ReducedMotion", v)
+			end
+		end).LayoutOrder = 10
 
-	-- Backdrop closes
+	-- Cleanup bei Destroy
+	screenGui.Destroying:Connect(function()
+		runCleanups()
+	end)
+
+	-- Backdrop closes (only LEFT / Touch)
 	backdrop.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1
 			or input.UserInputType == Enum.UserInputType.Touch then

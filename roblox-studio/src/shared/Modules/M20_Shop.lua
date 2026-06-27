@@ -26,6 +26,10 @@ local Localization = require(ReplicatedStorage.Shared.Modules.M15_Localization)
 
 local M20_Shop = {}
 
+-- Optional Purchase-Callback (set by server-side initializer)
+-- Signature: (player: Player, itemId: string, item: any) -> (ok: boolean, err: string?)
+M20_Shop.PurchaseHandler = nil
+
 M20_Shop.Theme = {
 	BackgroundColor = Color3.fromRGB(25, 28, 35),
 	ItemIdle = Color3.fromRGB(50, 55, 70),
@@ -102,7 +106,7 @@ local function makeUICorner(parent, radius)
 	c.Parent = parent
 end
 
-local function makeItemCard(parent, item, playerGold, playerIsVip)
+local function makeItemCard(parent, item, playerGold, playerIsVip, player)
 	local card = Instance.new("Frame")
 	card.Name = "ItemCard_" .. item.id
 	card.Size = UDim2.new(1 / M20_Shop.Theme.GridColumns, -8, 0, 110)
@@ -181,6 +185,44 @@ local function makeItemCard(parent, item, playerGold, playerIsVip)
 		                                       or M20_Shop.Theme.ItemUnaffordable }):Play()
 	end)
 
+	-- Buy handler — Klick auf Card (nur wenn kaufbar)
+	if canAfford then
+		local clickBtn = Instance.new("TextButton")
+		clickBtn.Name = "BuyButton"
+		clickBtn.Size = UDim2.new(1, 0, 1, 0)
+		clickBtn.BackgroundTransparency = 1
+		clickBtn.Text = ""
+		clickBtn.AutoButtonColor = false
+		clickBtn.Parent = card
+
+		clickBtn.MouseButton1Click:Connect(function()
+			-- Audio-Buy-Sound (TODO Phase 3: eigener Sound)
+
+			-- Optional Callback (server-side gate)
+			if M20_Shop.PurchaseHandler then
+				local ok, err = M20_Shop.PurchaseHandler(player, item.id, item)
+				if not ok then
+					Log:Warn("[M20] Purchase rejected: " .. tostring(err))
+					-- Visual feedback: flash red briefly
+					local old = card.BackgroundColor3
+					TweenService:Create(card,
+						TweenInfo.new(0.15, Enum.EasingStyle.Quad),
+						{ BackgroundColor3 = Color3.fromRGB(180, 40, 40) }):Play()
+					task.delay(0.5, function()
+						if card.Parent then
+							TweenService:Create(card,
+								TweenInfo.new(0.2, Enum.EasingStyle.Quad),
+								{ BackgroundColor3 = old }):Play()
+						end
+					end)
+				end
+			else
+				-- Dev-Fallback: nur loggen (kein echter Kauf ohne Server-Gate)
+				Log:Warn("[M20] No PurchaseHandler set — item " .. item.id .. " click ignored")
+			end
+		end)
+	end
+
 	return card
 end
 
@@ -257,17 +299,23 @@ function M20_Shop:Show(player: Player)
 	pcall(function()
 		if M07_Economy.GetBalance then
 			local balance = M07_Economy:GetBalance(player)
-			if balance then playerGold = balance.gold or 0 end
+			if balance then
+				playerGold = balance.gold or 0
+				-- VIP-Status aus Wallet lesen (statt hardcoded false)
+				playerIsVip = M07_Economy.IsVipActive
+					and M07_Economy:IsVipActive(balance, os.time())
+					or false
+			end
 		end
 	end)
 
 	-- Add items
 	for i, item in ipairs(M20_Shop.SampleItems) do
-		local card = makeItemCard(grid, item, playerGold, playerIsVip)
+		local card = makeItemCard(grid, item, playerGold, playerIsVip, player)
 		card.LayoutOrder = i
 	end
 
-	-- Backdrop closes shop
+	-- Backdrop closes shop (nur LEFT click / Touch, nicht RIGHT click)
 	backdrop.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1
 			or input.UserInputType == Enum.UserInputType.Touch then

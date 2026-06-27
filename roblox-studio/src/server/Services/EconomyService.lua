@@ -14,11 +14,9 @@
 local Players = game:GetService("Players")
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local Log = require(ReplicatedStorage.Shared.Util.Log)
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local Log = require(ReplicatedStorage.Shared.Util.Log)
 local M07_Economy = require(ReplicatedStorage.Shared.Modules.M07_Economy)
 local SaveService   = require(ServerScriptService.Services.SaveService)
 local TelemetryService = require(ServerScriptService.Services.TelemetryService)
@@ -32,6 +30,11 @@ local EconomyService = {}
 -- Wallets werden beim Join via SaveService geladen.
 local wallets: { [Player]: M07_Economy.Wallet } = {}
 
+-- Pending-Load-Tracker: wenn SaveService.LoadWallet asynchron ist, schützen wir
+-- die wallet-Map vor Race-Conditions (vorher: ensureWallet setzt default,
+-- LoadWallet-Callback überschreibt später → Lost-Update-Bug).
+local walletLoadPending: { [Player]: boolean } = {}
+
 local function ensureWallet(player: Player): M07_Economy.Wallet
 	if not wallets[player] then
 		wallets[player] = {
@@ -43,6 +46,14 @@ local function ensureWallet(player: Player): M07_Economy.Wallet
 		}
 	end
 	return wallets[player]
+end
+
+-- Auto-Expire für VIP (damit Flag nie „kleben bleibt")
+local function refreshVipStatus(wallet: M07_Economy.Wallet): M07_Economy.Wallet
+	if wallet.VIPActive and wallet.VIPExpiresAt > 0 and wallet.VIPExpiresAt <= os.time() then
+		wallet.VIPActive = false
+	end
+	return wallet
 end
 
 -- Daily-Bonus-State (3 verbrauchbare Boosts pro Tag)
@@ -64,17 +75,25 @@ local remoteAddGold = Instance.new("RemoteEvent")
 remoteAddGold.Name = "AddGold" -- Server-only, Client darf NIE senden
 remoteAddGold.Parent = remotesFolder
 
+local remoteAddGems = Instance.new("RemoteEvent")
+remoteAddGems.Name = "AddGems" -- Server-only, Client darf NIE senden
+remoteAddGems.Parent = remotesFolder
+
+local remoteVipStateChanged = Instance.new("RemoteEvent")
+remoteVipStateChanged.Name = "VipStateChanged"
+remoteVipStateChanged.Parent = remotesFolder
+
 -- ============================================================
 -- Public API
 -- ============================================================
 
 function EconomyService:GetBalance(player: Player): M07_Economy.Wallet
-	return ensureWallet(player)
+	return refreshVipStatus(ensureWallet(player))
 end
 
 function EconomyService:AddGold(player: Player, amount: number, source: string?)
 	if amount <= 0 then return end
-	local wallet = ensureWallet(player)
+	local wallet = refreshVipStatus(ensureWallet(player))
 
 	-- Daily-Bonus anwenden, falls Charge verfügbar
 	local db = dailyBonus[player]
@@ -96,7 +115,7 @@ end
 
 function EconomyService:AddGems(player: Player, amount: number, source: string?)
 	if amount <= 0 then return end
-	local wallet = ensureWallet(player)
+	local wallet = refreshVipStatus(ensureWallet(player))
 	wallet.Gems = math.min(wallet.Gems + amount, M07_Economy.Limits.Gems.HardCap)
 
 	TelemetryService:Track(player, "economy.gems.added", {
@@ -104,6 +123,8 @@ function EconomyService:AddGems(player: Player, amount: number, source: string?)
 		source = source or "unknown",
 		new_balance = wallet.Gems,
 	})
+
+	remoteAddGems:FireClient(player, wallet.Gems)
 end
 
 function EconomyService:SpendGold(player: Player, amount: number, reason: string): boolean
@@ -212,6 +233,8 @@ function EconomyService:GrantVip(player: Player, durationSeconds: number)
 		expires_at = wallet.VIPExpiresAt,
 		duration = durationSeconds,
 	})
+
+	remoteVipStateChanged:FireClient(player, wallet.VIPActive, wallet.VIPExpiresAt)
 end
 
 -- ============================================================
@@ -302,14 +325,38 @@ end
 -- ============================================================
 
 Players.PlayerAdded:Connect(function(player)
+	-- Default-Wallet als Platzhalter (Race-frei: kein asynchroner Read schreibt
+	-- auf diese Map, bis walletLoadPending abgebaut ist)
 	ensureWallet(player)
 	dailyBonus[player] = { Charges = M07_Economy.DailyBonus.MaxCharges, LastReset = os.time() }
+	walletLoadPending[player] = true
 
-	-- Wallet aus SaveService laden
 	SaveService:LoadWallet(player, function(loaded)
-		if loaded then
-			wallets[player] = loaded
+		-- Race-Schutz: wenn Spieler inzwischen disconnected ist, nichts tun
+		if not player.Parent then
+			walletLoadPending[player] = nil
+			return
 		end
+
+		if loaded and type(loaded) == "table" then
+			-- Merged: nur Felder übernehmen, die in loaded sind; Rest bleibt default.
+			-- Verhindert, dass „null" den default-Wallet überschreibt.
+			local current = wallets[player]
+			if not current then
+				current = ensureWallet(player)
+			end
+			for k, v in pairs(loaded) do
+				(current :: any)[k] = v
+			end
+			-- Schema-Sanity (falls korrupte Save-Daten)
+			if type(current.Gold) ~= "number" then current.Gold = 0 end
+			if type(current.Gems) ~= "number" then current.Gems = 0 end
+			if type(current.VIPActive) ~= "boolean" then current.VIPActive = false end
+			if type(current.VIPExpiresAt) ~= "number" then current.VIPExpiresAt = 0 end
+		end
+
+		refreshVipStatus(wallets[player])
+		walletLoadPending[player] = nil
 		remoteGetBalance:InvokeClient(player, wallets[player])
 	end)
 end)
@@ -317,9 +364,11 @@ end)
 Players.PlayerRemoving:Connect(function(player)
 	local wallet = wallets[player]
 	if wallet then
+		refreshVipStatus(wallet)
 		SaveService:SaveWallet(player, wallet)
 	end
 	dailyBonus[player] = nil
+	walletLoadPending[player] = nil
 	wallets[player] = nil
 end)
 
@@ -328,8 +377,18 @@ task.spawn(function()
 	while true do
 		task.wait(60)
 		for player, wallet in pairs(wallets) do
+			refreshVipStatus(wallet)
 			SaveService:SaveWallet(player, wallet)
 		end
+	end
+end)
+
+-- BindToClose: letzte Save-Welle bei Server-Shutdown
+game:BindToClose(function()
+	Log:Info("[EconomyService] BindToClose — flushing all wallets")
+	for player, wallet in pairs(wallets) do
+		refreshVipStatus(wallet)
+		pcall(SaveService.SaveWallet, SaveService, player, wallet)
 	end
 end)
 

@@ -94,7 +94,7 @@ end
 local function makeCurrencyRow(parent, name, color, icon, initialValue)
 	local row = Instance.new("Frame")
 	row.Name = name .. "Row"
-	row.Size = UDim2.new(1, 0, 0, 36)
+	row.Size = UDim2.new(1, 0, 0, 44)  -- WCAG: ≥ 44×44 touch target
 	row.BackgroundColor3 = Color3.fromRGB(40, 45, 55)
 	row.BorderSizePixel = 0
 	row.Parent = parent
@@ -103,18 +103,18 @@ local function makeCurrencyRow(parent, name, color, icon, initialValue)
 
 	local iconLabel = Instance.new("TextLabel")
 	iconLabel.Name = "Icon"
-	iconLabel.Size = UDim2.new(0, 36, 1, 0)
+	iconLabel.Size = UDim2.new(0, 44, 1, 0)
 	iconLabel.BackgroundTransparency = 1
 	iconLabel.Font = M17_HUD.Theme.Font
-	iconLabel.TextSize = 22
+	iconLabel.TextSize = 24
 	iconLabel.TextColor3 = color
 	iconLabel.Text = icon
 	iconLabel.Parent = row
 
 	local valueLabel = Instance.new("TextLabel")
 	valueLabel.Name = "Value"
-	valueLabel.Size = UDim2.new(1, -50, 1, 0)
-	valueLabel.Position = UDim2.new(0, 44, 0, 0)
+	valueLabel.Size = UDim2.new(1, -52, 1, 0)
+	valueLabel.Position = UDim2.new(0, 48, 0, 0)
 	valueLabel.BackgroundTransparency = 1
 	valueLabel.Font = M17_HUD.Theme.Font
 	valueLabel.TextSize = M17_HUD.Theme.FontSize
@@ -123,17 +123,28 @@ local function makeCurrencyRow(parent, name, color, icon, initialValue)
 	valueLabel.Text = tostring(initialValue)
 	valueLabel.Parent = row
 
-	-- Smooth update via TweenService
+	-- Real CountUp-Tween: NumberValue gets tweened, listener updates label
+	local state = Instance.new("NumberValue")
+	state.Name = "_tweenState"
+	state.Value = tonumber(tostring(initialValue)) or 0
+	state.Parent = row
+	state:GetPropertyChangedSignal("Value"):Connect(function()
+		valueLabel.Text = tostring(math.floor(state.Value + 0.5))
+	end)
+
 	local function setValueAnimated(newValue)
-		local oldVal = tonumber(valueLabel.Text) or 0
-		if oldVal == newValue then return end
-		local tweenInfo = TweenInfo.new(M17_HUD.Theme.TweenDuration,
+		local target = tonumber(tostring(newValue))
+		if not target then
+			-- non-numeric (e.g. VIP "Aktiv")
+			valueLabel.Text = tostring(newValue)
+			return
+		end
+		local current = state.Value
+		if current == target then return end
+		local tweenInfo = TweenInfo.new(M17_HUD.Theme.TweenDuration * 2,
 		                                 Enum.EasingStyle.Quad,
 		                                 Enum.EasingDirection.Out)
-		-- Pseudo-CountUp via NumberValue tween (kept simple here)
-		local t = TweenService:Create(valueLabel, tweenInfo, { TextTransparency = 0 })
-		t:Play()
-		valueLabel.Text = tostring(newValue)
+		TweenService:Create(state, tweenInfo, { Value = target }):Play()
 	end
 
 	row.SetValue = setValueAnimated
@@ -172,7 +183,9 @@ function M17_HUD:CreateForPlayer(player: Player): ScreenGui
 	local screenGui = Instance.new("ScreenGui")
 	screenGui.Name = "CurioHUD"
 	screenGui.ResetOnSpawn = false
+	screenGui.DisplayOrder = 50  -- über Default-UI, unter Dialogue(100)/Shop(110)
 	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	screenGui.IgnoreGuiInset = false  -- safe-area aware
 	screenGui.Parent = playerGui
 
 	-- Top-Left HUD-Container
