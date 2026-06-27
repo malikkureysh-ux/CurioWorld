@@ -1,0 +1,148 @@
+version: 1
+plan:
+  name: 'Curio World — Phase 2 Verification (Code, Tests, Docs)'
+  max_concurrency: 3
+  max_consecutive_failures: 2
+  max_cycles: 1
+
+tasks:
+  # ============================================================
+  # Verifier 1: Code Review
+  # ============================================================
+  - id: code-review
+    title: 'Phase 2 Luau Code Review'
+    prompt: |
+      You are doing a CODE REVIEW of the Phase 2 Luau code in the Curio World Roblox project.
+
+      WORKSPACE: C:\Users\malik_n9u\Documents\Projekte\Roblox Studio - Blender - MCP
+
+      KEY FILES (new in Phase 2):
+      - roblox-studio/src/shared/Util/ServiceRegistry.lua
+      - roblox-studio/src/shared/Util/Log.lua
+      - roblox-studio/src/shared/Modules/MapBuilder.lua
+      - roblox-studio/src/shared/Data/hamburg_harbor_map.lua
+      - roblox-studio/src/shared/Modules/M02_Quest.lua (3 new quests: HH_01, HH_02, HH_03)
+      - roblox-studio/src/shared/Data/locales.lua (9 languages)
+      - roblox-studio/src/server/init.server.lua
+      - roblox-studio/src/server/Services/SaveService.lua
+      - roblox-studio/src/server/Services/EconomyService.lua
+      - roblox-studio/src/server/Services/TelemetryService.lua
+      - roblox-studio/src/client/init.client.lua
+      - roblox-studio/src/shared/Modules/M01_PlayerController.lua, M04_Adaptive.lua, M07_Economy.lua, M13_Moderation.lua, M15_Localization.lua
+
+      REVIEW CRITERIA (be specific, file:line format):
+      1. Type safety: --!strict, type annotations, export type, no implicit any
+      2. Service-Locator pattern correctness (ServiceRegistry:WaitFor deadlock risk?)
+      3. MapBuilder:Validate() depth
+      4. EconomyService:TryPurchase race conditions on Gold/Gems spending
+      5. TelemetryService buffer overflow handling
+      6. i18n placeholder substitution security (XSS via user args)
+      7. Quest-Step completion_condition type signature
+      8. Memory leaks (subscriptions, PlayerRemoving cleanup)
+      9. Per-frame allocations and table growth
+
+      OUTPUT: write deliverable.md with:
+      - Critical issues (file:line + fix suggestion)
+      - Warnings (file:line)
+      - 3-5 Strengths
+      - Premium-Score X/10
+
+      DO NOT WRITE/MODIFY CODE FILES. Review only.
+    assigned_to: verifier
+    verify_skip_reason: "Task IS the verification work — no need for second-pass verifier. Output is a structured review (deliverable.md) consumed by the orchestrator (Mavis) directly. Adding a second verifier on a review would be a circular meta-review with no additional signal."
+
+  # ============================================================
+  # Verifier 2: Test + Compliance Audit
+  # ============================================================
+  - id: test-compliance-audit
+    title: 'Phase 2 Test Execution + Compliance Verification'
+    prompt: |
+      You are verifying TestEZ test specs and compliance claims for Curio World.
+
+      WORKSPACE: C:\Users\malik_n9u\Documents\Projekte\Roblox Studio - Blender - MCP
+
+      TEST FILES:
+      - roblox-studio/src/tests/M07_Economy.spec.lua
+      - roblox-studio/src/tests/M15_Localization.spec.lua
+
+      DOCS TO AUDIT:
+      - research/compliance_audit_2026-06-27.md (claims C-002, C-003, C-007, C-013, C-019 PASS)
+      - research/domain_research_2026-06-27.md
+      - state/playtest-plan.md
+      - docs/02_compliance_matrix.md
+
+      TASKS:
+      1. **Analyze test specs** — Do assertions test what they claim? Any false-pass risks? Missing edge cases?
+
+      2. **Compliance verification per rule** — read the code to verify each claim:
+         - C-002 (no Pay-to-Win): M07_Economy.AuditItem, M07_Economy.VIP.ForbiddenBenefits, EconomyService:TryPurchase
+         - C-003 (Werbung-Transparenz): locales.lua compliance_notice, shop UI
+         - C-007 (no Stamina): M07_Economy.DailyBonus, no Stamina/Energy anywhere
+         - C-013 (Minderjährigenschutz): M13_Moderation.CanSendMessage, SaveService.encryptField, TelemetryService hash
+         - C-019 (Robux-Transparenz): MarketplaceService.ProcessReceipt logging
+
+      3. **Domain research verification** — Is curioworld.de really available? Look at WHOIS evidence. Caveats?
+
+      4. **Playtest plan audit** — Sample sizes (90 Spieler, 30 Eltern, 15 Lehrkräfte) appropriate? Success criteria measurable?
+
+      OUTPUT: write deliverable.md with:
+      - Test quality: any spec issues, missing edge cases, false-pass risks
+      - Compliance audit verdict: PASS / PARTIAL PASS / FAIL with specific evidence per rule
+      - Domain research verdict: confirmed / unconfirmed + caveats
+      - Playtest plan verdict: methodology sound / issues to fix
+      - Premium-Score: X/10
+
+      DO NOT WRITE/MODIFY FILES. Audit only.
+    assigned_to: verifier
+    verify_skip_reason: "Task IS the audit work — verifier role is producing structured verdicts. Orchestrator (Mavis) reviews the output. Meta-verifying a compliance audit would be circular without a separate domain expert."
+
+  # ============================================================
+  # Verifier 3: Documentation Consistency
+  # ============================================================
+  - id: doc-consistency-audit
+    title: 'Phase 2 Documentation Consistency Audit'
+    prompt: |
+      You are checking documentation consistency for Curio World.
+
+      WORKSPACE: C:\Users\malik_n9u\Documents\Projekte\Roblox Studio - Blender - MCP
+
+      CROSS-CHECK FILES:
+      - docs/00_product_vision.md
+      - docs/06_world_bible.md
+      - docs/09_system_architecture.md
+      - docs/10_economy_design.md
+      - decisions/D-001_naming.md (should say 'Curio World')
+      - decisions/D-002_vertical_slice_district.md
+      - decisions/D-004_monetization.md
+      - decisions/D-010_currency.md
+      - decisions/D-014_harbor_movement.md
+      - roblox-studio/src/shared/Modules/M02_Quest.lua
+      - roblox-studio/src/shared/Data/hamburg_harbor_map.lua
+      - roblox-studio/src/shared/Data/locales.lua
+      - research/phase_2_market_analysis_2026-06-27.md
+
+      TASKS — find inconsistencies:
+      1. **Naming**: 'Curio World' used everywhere? Any leftover 'Wonder World', 'MetroMinds', 'Harbor Forge'?
+      2. **District count**: 5 districts consistent across all docs?
+      3. **Currency**: Gold + Gems + Robux, NO Stamina consistent in M07_Economy?
+      4. **VIP-Pass**: ForbiddenBenefits list complete in code?
+      5. **Hamburg Harbor**: 3 quests (HH_01-HH_03) + 4 NPCs consistent?
+      6. **Locale coverage**: 9 languages (DE/EN/ES/FR/HI/TR/ZH/JA/AR) in BOTH M15_Localization.Languages AND locales.lua?
+      7. **Naming audit trail**: D-001 mentions MetroMinds → Wonder World → Curio World?
+      8. **Map structure**: default.project.json HamburgHarbor folder coherent?
+
+      OUTPUT: write deliverable.md with:
+      - Naming consistency: PASS/FAIL with line refs
+      - District count: PASS/FAIL
+      - Currency model: PASS/FAIL
+      - VIP-Pass: PASS/FAIL
+      - Hamburg Harbor details: PASS/FAIL
+      - Locale coverage: PASS/FAIL
+      - Naming audit trail: PASS/FAIL
+      - Map structure: PASS/FAIL
+      - Top 3 inconsistencies to fix (file:line + suggested fix)
+      - Premium-Score: X/10
+
+      DO NOT WRITE/MODIFY FILES. Audit only.
+    assigned_to: verifier
+    verify_skip_reason: "Task IS the consistency audit. Orchestrator (Mavis) reviews the inconsistencies list. Second-pass verification of a consistency report is low-value (consistency is binary, not subjective)."

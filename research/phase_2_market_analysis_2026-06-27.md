@@ -1,8 +1,10 @@
 # Phase 2 — Marktanalyse & Naming-Check
 
-**Datum:** 2026-06-27 14:35
+**Datum:** 2026-06-27 14:35 (Initial), 2026-06-27 14:50 (Refit auf Curio World)
 **Quelle:** Web-Recherche via matrix MCP (web_search)
-**Status:** ⚠️ KRITISCHER NAMING-KONFLIKT GEFUNDEN
+**Status:** ✅ RESOLVED — Naming-Konflikt identifiziert und aufgelöst
+
+> **Status-Update (2026-06-27 14:50):** Superseded by `decisions/D-001_naming.md`. Final-Name: **Curio World**. Diese Analyse identifizierte die Wonder-World-Kollision; die Lösung war der Pivot auf **Curio World** (NICHT auf einen Wonder-World-Sub-Title). Sub-Title-Varianten weiter unten in diesem Dokument sind als **Optionen zur Diskussion** zu lesen, nicht als Empfehlung.
 
 ## 1. Naming-Check (KRITISCH)
 
@@ -94,7 +96,7 @@ University of Sydney (März 2025 + Mai 2026): Studie zu Roblox-In-Game-Spending 
 ## Empfehlung
 
 1. **Naming-Konflikt sofort lösen** (siehe Optionen oben).
-2. **Marketing-Positionierung:** „Wonder World [Sub]: Das Adventure-Spiel, bei dem du nebenbei Mathe, Physik und Co. lernst — ohne es zu merken."
+2. **Marketing-Positionierung (geupdated auf Curio World):** „**Curio World**: Das Adventure-Spiel, bei dem du nebenbei Mathe, Physik und Co. lernst — ohne es zu merken." (Begründung: Curio = Neugier + Rarität, transportiert die Kern-Vision ohne den Wonder-World-Kollider.)
 3. **Such-Tags:** adventure, city, explore, anime, pets, educational, family-friendly, no-pay-to-win.
 4. **Erste Tester:** Q1 2026 in Brasilien + Türkei (DE/EN/TR-Cluster), dann Asien (JP/ZH), dann MENA (AR).
 

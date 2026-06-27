@@ -14,11 +14,11 @@
 	- Werft (Bootsbau, Werkzeuge)
 	- Leuchtturm-Insel (Höhepunkt, Aussicht)
 
-	NPCs:
-	- Mira (Hüterin, Hub)
-	- Tomo (Händler, Speicherhaus)
-	- Werft-Meister (Werft)
-	- Kapitän (Leuchtturm)
+	NPCs (Vertical-Slice-Roster, 4 Rollen):
+	- Hafenwirtin Lina (PlazaEntry, main quest giver)
+	- Markt-Händlerin Yuki (Speicherhaus, merchant)
+	- Bootsbauerin Maja (Werft, crafter)
+	- Leuchtturmwächter Nils (Leuchtturm, story)
 ]]
 
 local HamburgHarbor = {
@@ -45,6 +45,18 @@ local HamburgHarbor = {
 						CanCollide = false,
 						Size = Vector3.new(8, 4, 0.5),
 						Position = Vector3.new(0, 8, -3),
+					},
+				},
+				{
+					Name = "HafenwirtinSpawn",
+					ClassName = "Part",
+					Properties = {
+						Anchored = true,
+						CanCollide = false,
+						Transparency = 1,
+						Size = Vector3.new(1, 2, 1),
+						Position = Vector3.new(0, 6, -2),
+						Attributes = { NpcId = "Hafenwirtin", Role = "QuestGiver" },
 					},
 				},
 			},
@@ -210,7 +222,7 @@ local HamburgHarbor = {
 					},
 				},
 				{
-					Name = "TomoSpawn",
+					Name = "YukiSpawn",
 					ClassName = "Part",
 					Properties = {
 						Anchored = true,
@@ -218,7 +230,7 @@ local HamburgHarbor = {
 						Transparency = 1,
 						Size = Vector3.new(1, 2, 1),
 						Position = Vector3.new(-40, 6, 32),
-						Attributes = { NpcId = "Tomo", Role = "Merchant" },
+						Attributes = { NpcId = "Yuki", Role = "Merchant" },
 					},
 				},
 				{
@@ -268,7 +280,7 @@ local HamburgHarbor = {
 					},
 				},
 				{
-					Name = "WerftMeisterSpawn",
+					Name = "MajaSpawn",
 					ClassName = "Part",
 					Properties = {
 						Anchored = true,
@@ -276,7 +288,7 @@ local HamburgHarbor = {
 						Transparency = 1,
 						Size = Vector3.new(1, 2, 1),
 						Position = Vector3.new(42, 6, 33),
-						Attributes = { NpcId = "WerftMeister", Role = "Crafter" },
+						Attributes = { NpcId = "Maja", Role = "Crafter" },
 					},
 				},
 			},
@@ -325,7 +337,7 @@ local HamburgHarbor = {
 					},
 				},
 				{
-					Name = "KapitaenSpawn",
+					Name = "NilsSpawn",
 					ClassName = "Part",
 					Properties = {
 						Anchored = true,
@@ -333,14 +345,14 @@ local HamburgHarbor = {
 						Transparency = 1,
 						Size = Vector3.new(1, 2, 1),
 						Position = Vector3.new(0, 4, 62),
-						Attributes = { NpcId = "Kapitaen", Role = "Story" },
+						Attributes = { NpcId = "Nils", Role = "Story" },
 					},
 				},
 			},
 		},
 
 		-- ============================================================
-		-- Quest-Starter-Schilder (für Mira & Tagesaufgaben)
+		-- Quest-Starter-Schilder (für Hafenwirtin & Tagesaufgaben)
 		-- ============================================================
 		{
 			Name = "QuestBoards",

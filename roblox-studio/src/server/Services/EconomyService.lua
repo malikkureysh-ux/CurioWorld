@@ -14,6 +14,9 @@
 local Players = game:GetService("Players")
 local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Log = require(ReplicatedStorage.Shared.Util.Log)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local M07_Economy = require(ReplicatedStorage.Shared.Modules.M07_Economy)
@@ -136,7 +139,7 @@ function EconomyService:SpendGems(player: Player, amount: number, reason: string
 end
 
 function EconomyService:TryPurchase(player: Player, item: M07_Economy.ShopItem): (boolean, string?)
-	-- Compliance-Audit
+	-- Compliance-Audit (compliance claim: AuditItem rejects Power items, C-002)
 	local ok, err = M07_Economy.AuditItem(item)
 	if not ok then
 		TelemetryService:Track(player, "economy.purchase.blocked_compliance", {
@@ -153,18 +156,31 @@ function EconomyService:TryPurchase(player: Player, item: M07_Economy.ShopItem):
 		return false, "vip_required"
 	end
 
-	-- Interne Währungen
+	-- Pre-check: CanAfford does atomic all-or-nothing affordability check
+	-- This prevents the C-3 race where Gold is debited but the Gems check
+	-- fails and the player gets nothing.
+	local canAfford, reason = M07_Economy.CanAfford(wallet, item)
+	if not canAfford then
+		return false, reason
+	end
+
+	-- Atomic deduct: mutate the wallet directly (no separate SpendGold/SpendGems
+	-- that would re-track telemetry and risk mid-transaction failure).
 	if item.PriceGold and item.PriceGold > 0 then
-		if not self:SpendGold(player, item.PriceGold, "purchase:" .. item.Id) then
-			return false, "not_enough_gold"
-		end
+		wallet.Gold -= item.PriceGold
+		TelemetryService:Track(player, "economy.gold.spent", {
+			amount = item.PriceGold,
+			reason = "purchase:" .. item.Id,
+			new_balance = wallet.Gold,
+		})
 	end
 	if item.PriceGems and item.PriceGems > 0 then
-		if not self:SpendGems(player, item.PriceGems, "purchase:" .. item.Id) then
-			-- Gems nicht abgebucht, weil Gold bereits weg? In Production
-			-- würde man hier Transaktionen mit Rollback machen. Vereinfacht:
-			return false, "not_enough_gems"
-		end
+		wallet.Gems -= item.PriceGems
+		TelemetryService:Track(player, "economy.gems.spent", {
+			amount = item.PriceGems,
+			reason = "purchase:" .. item.Id,
+			new_balance = wallet.Gems,
+		})
 	end
 
 	-- Robux-Käufe laufen über MarketplaceService.ProcessReceipt
@@ -235,19 +251,49 @@ end
 
 local VipPassProductId = 0 -- TODO: echte Asset-ID nach Studio-Setup
 
+-- Receipt idempotency: track processed receipts to prevent replay double-grants
+-- (server crash between grant and acknowledge → Roblox re-sends receipt).
+local processedReceipts: { [string]: boolean } = {}
+
 MarketplaceService.ProcessReceipt = function(receiptInfo)
 	local player = Players:GetPlayerByUserId(receiptInfo.PlayerId)
 	if not player then
 		return Enum.ProductPurchaseDecision.NotProcessedYet
 	end
 
+	-- Idempotency check
+	if processedReceipts[receiptInfo.PurchaseId] then
+		Log:Info(string.format("[EconomyService] Receipt already processed: %s", receiptInfo.PurchaseId))
+		return Enum.ProductPurchaseDecision.PurchaseGranted
+	end
+
 	if receiptInfo.ProductId == VipPassProductId then
 		EconomyService:GrantVip(player, M07_Economy.VIP.DurationSeconds)
+		processedReceipts[receiptInfo.PurchaseId] = true
+
+		-- C-019: explicit success-path logging for parent dispute resolution
+		Log:Info(string.format(
+			"[EconomyService] VIP GRANTED: player=%s userId=%d productId=%d purchaseId=%s ts=%d",
+			player.Name, player.UserId, receiptInfo.ProductId,
+			receiptInfo.PurchaseId, os.time()
+		))
+		TelemetryService:Track(player, "vip.purchased", {
+			productId = receiptInfo.ProductId,
+			purchaseId = receiptInfo.PurchaseId,
+			amount = receiptInfo.CurrencySpent or 0,
+		})
+
 		return Enum.ProductPurchaseDecision.PurchaseGranted
 	end
 
 	-- Unbekanntes Produkt: nicht gewähren, Roblox-Logs prüfen
-	warn("[EconomyService] Unknown product:", receiptInfo.ProductId)
+	warn(string.format(
+		"[EconomyService] UNKNOWN product: player=%s userId=%d productId=%d purchaseId=%s ts=%d",
+		player.Name, player.UserId, receiptInfo.ProductId, receiptInfo.PurchaseId, os.time()
+	))
+	TelemetryService:Track(player, "vip.unknown_product", {
+		productId = receiptInfo.ProductId,
+	})
 	return Enum.ProductPurchaseDecision.NotProcessedYet
 end
 

@@ -15,7 +15,7 @@ Welche Währungen verwenden wir? Die Draft-Konzepte zeigen drei Währungen (Gold
 - **Gold (Soft):** Hauptwährung, durch Gameplay verdient. Für Standard-Cosmetics, Deko, Foto-Filter.
 - **Gems (Soft-Selten):** Seltenere Währung, durch besondere Aktivitäten (Quest-Abschluss, monatliche Events). Für Premium-Cosmetics, exklusive Companions, Saisonpass-Items.
 - **Robux (Echtgeld-Premium):** Für VIP-Pass, exklusive Cosmetics, Companion-Slots, Foto-Filter.
-- **KEIN Stamina / Energy:** Anti-Frust. Alle Aktivitäten sind unbegrenzt spielbar. Daily-Caps nur als Belohnungs-Boost (z.B. +50 % Gold-Bonus für die ersten 3 Quests pro Tag), nicht als Sperre.
+- **KEIN Stamina / Energy:** Anti-Frust. Alle Aktivitäten sind unbegrenzt spielbar. Daily-Caps nur als Belohnungs-Boost (z.B. +20 % Gold-Bonus für die ersten 3 Quests pro Tag, siehe M07_Economy.DailyBonus.GoldMultiplier = 1.2), nicht als Sperre.
 
 ### Option B — Spark + Robux (verworfen)
 

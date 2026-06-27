@@ -41,9 +41,19 @@ Locales.de = {
 	["district.moon_bazaar.name"]     = "Moon Bazaar",
 	["district.moon_bazaar.tagline"]  = "Gewürze, Sterne, Geschichten.",
 
-	-- NPCs
-	["npc.mira.greeting"]    = "Hallo! Ich bin Mira. Brauchst du Hilfe bei einer Quest?",
-	["npc.tomo.greeting"]    = "Reisende Händler kommen und gehen. Schau dir meine Waren an!",
+	-- NPCs (4-NPC Vertical-Slice-Roster)
+	["npc.hafenwirtin.greeting"] = "Hallo! Ich bin Lina, die Hafenwirtin. Willkommen in Hamburg Harbor!",
+	["npc.yuki.greeting"]       = "Reisende Händler kommen und gehen. Schau dir meine Waren an!",
+	["npc.maja.greeting"]       = "Boote brauchen Holz, Segel und Geduld. Hilfst du mir beim Bau?",
+	["npc.nils.greeting"]       = "Von hier oben kannst du den ganzen Hafen sehen. Wunderschön, oder?",
+
+	-- Quests
+	["quest.hh_01.title"]       = "Der erste Kran",
+	["quest.hh_01.description"] = "Lina zeigt dir, wie die Hafenkräne funktionieren.",
+	["quest.hh_02.title"]       = "Heb die Fracht",
+	["quest.hh_02.description"] = "Bewege einen Container mit einem Kran von einem Dock zum anderen.",
+	["quest.hh_03.title"]       = "Bau ein Boot zusammen",
+	["quest.hh_03.description"] = "Die Werft braucht Hilfe. Sammle Material und bau ein kleines Boot mit.",
 
 	-- Compliance
 	["compliance.under_13_notice"] = "Du bist unter 13 — Käufe benötigen die Zustimmung deiner Eltern.",
@@ -76,10 +86,10 @@ Locales.en = {
 	["district.moon_bazaar.name"]     = "Moon Bazaar",
 	["district.moon_bazaar.tagline"]  = "Spices, stars, stories.",
 
-	["npc.mira.greeting"]    = "Hi! I'm Mira. Need help with a quest?",
-	["npc.tomo.greeting"]    = "Traveling merchants come and go. Browse my wares!",
-	["npc.werftmeister.greeting"] = "Boats need wood, sails, and patience. Want to help?",
-	["npc.kapitaen.greeting"] = "From up here, you can see the whole harbor. Beautiful, isn't it?",
+	["npc.hafenwirtin.greeting"]    = "Hi! I'm Mira. Need help with a quest?",
+	["npc.yuki.greeting"]    = "Traveling merchants come and go. Browse my wares!",
+	["npc.maja.greeting"] = "Boats need wood, sails, and patience. Want to help?",
+	["npc.nils.greeting"] = "From up here, you can see the whole harbor. Beautiful, isn't it?",
 
 	["quest.hh_01.title"]       = "The First Crane",
 	["quest.hh_01.description"] = "Mira wants to show you how the harbor cranes work.",
@@ -122,10 +132,10 @@ Locales.es = {
 	["district.moon_bazaar.name"]     = "Bazar Luna",
 	["district.moon_bazaar.tagline"]  = "Especias, estrellas, historias.",
 
-	["npc.mira.greeting"]    = "¡Hola! Soy Mira. ¿Necesitas ayuda con una misión?",
-	["npc.tomo.greeting"]    = "Los mercaderes viajeros van y vienen. ¡Mira mis productos!",
-	["npc.werftmeister.greeting"] = "Los barcos necesitan madera, velas y paciencia. ¿Quieres ayudar?",
-	["npc.kapitaen.greeting"] = "Desde aquí arriba se ve todo el puerto. ¿Hermoso, verdad?",
+	["npc.hafenwirtin.greeting"]    = "¡Hola! Soy Mira. ¿Necesitas ayuda con una misión?",
+	["npc.yuki.greeting"]    = "Los mercaderes viajeros van y vienen. ¡Mira mis productos!",
+	["npc.maja.greeting"] = "Los barcos necesitan madera, velas y paciencia. ¿Quieres ayudar?",
+	["npc.nils.greeting"] = "Desde aquí arriba se ve todo el puerto. ¿Hermoso, verdad?",
 
 	["quest.hh_01.title"]       = "La Primera Grúa",
 	["quest.hh_01.description"] = "Mira quiere enseñarte cómo funcionan las grúas del puerto.",
@@ -168,10 +178,10 @@ Locales.fr = {
 	["district.moon_bazaar.name"]     = "Bazar Lune",
 	["district.moon_bazaar.tagline"]  = "Épices, étoiles, histoires.",
 
-	["npc.mira.greeting"]    = "Salut ! Je suis Mira. Tu as besoin d'aide pour une quête ?",
-	["npc.tomo.greeting"]    = "Les marchands voyageurs vont et viennent. Regarde mes marchandises !",
-	["npc.werftmeister.greeting"] = "Les bateaux ont besoin de bois, de voiles et de patience. Tu veux aider ?",
-	["npc.kapitaen.greeting"] = "D'ici, on voit tout le port. Magnifique, n'est-ce pas ?",
+	["npc.hafenwirtin.greeting"]    = "Salut ! Je suis Mira. Tu as besoin d'aide pour une quête ?",
+	["npc.yuki.greeting"]    = "Les marchands voyageurs vont et viennent. Regarde mes marchandises !",
+	["npc.maja.greeting"] = "Les bateaux ont besoin de bois, de voiles et de patience. Tu veux aider ?",
+	["npc.nils.greeting"] = "D'ici, on voit tout le port. Magnifique, n'est-ce pas ?",
 
 	["quest.hh_01.title"]       = "La Première Grue",
 	["quest.hh_01.description"] = "Mira veut te montrer comment fonctionnent les grues du port.",
@@ -214,10 +224,10 @@ Locales.tr = {
 	["district.moon_bazaar.name"]     = "Ay Pazarı",
 	["district.moon_bazaar.tagline"]  = "Baharatlar, yıldızlar, hikâyeler.",
 
-	["npc.mira.greeting"]    = "Merhaba! Ben Mira. Bir görev için yardıma ihtiyacın var mı?",
-	["npc.tomo.greeting"]    = "Gezgin tüccarlar gelir ve gider. Mallarıma bir bak!",
-	["npc.werftmeister.greeting"] = "Gemiler tahtaya, yelkenlere ve sabıra ihtiyaç duyar. Yardım eder misin?",
-	["npc.kapitaen.greeting"] = "Buradan tüm limanı görebilirsin. Güzel, değil mi?",
+	["npc.hafenwirtin.greeting"]    = "Merhaba! Ben Mira. Bir görev için yardıma ihtiyacın var mı?",
+	["npc.yuki.greeting"]    = "Gezgin tüccarlar gelir ve gider. Mallarıma bir bak!",
+	["npc.maja.greeting"] = "Gemiler tahtaya, yelkenlere ve sabıra ihtiyaç duyar. Yardım eder misin?",
+	["npc.nils.greeting"] = "Buradan tüm limanı görebilirsin. Güzel, değil mi?",
 
 	["quest.hh_01.title"]       = "İlk Vinç",
 	["quest.hh_01.description"] = "Mira sana liman vinçlerinin nasıl çalıştığını göstermek istiyor.",
@@ -260,10 +270,10 @@ Locales.hi = {
 	["district.moon_bazaar.name"]     = "चाँद बाज़ार",
 	["district.moon_bazaar.tagline"]  = "मसाले, सितारे, कहानियाँ।",
 
-	["npc.mira.greeting"]    = "नमस्ते! मैं मीरा हूँ। क्या आपको किसी खोज में मदद चाहिए?",
-	["npc.tomo.greeting"]    = "यात्रा करने वाले व्यापारी आते-जाते रहते हैं। मेरा सामान देखें!",
-	["npc.werftmeister.greeting"] = "नावों को लकड़ी, पाल और धैर्य चाहिए। क्या आप मदद करेंगे?",
-	["npc.kapitaen.greeting"] = "यहाँ से पूरा बंदरगाह दिखता है। सुंदर है, है ना?",
+	["npc.hafenwirtin.greeting"]    = "नमस्ते! मैं मीरा हूँ। क्या आपको किसी खोज में मदद चाहिए?",
+	["npc.yuki.greeting"]    = "यात्रा करने वाले व्यापारी आते-जाते रहते हैं। मेरा सामान देखें!",
+	["npc.maja.greeting"] = "नावों को लकड़ी, पाल और धैर्य चाहिए। क्या आप मदद करेंगे?",
+	["npc.nils.greeting"] = "यहाँ से पूरा बंदरगाह दिखता है। सुंदर है, है ना?",
 
 	["quest.hh_01.title"]       = "पहली क्रेन",
 	["quest.hh_01.description"] = "मीरा आपको बंदरगाह की क्रेनों का काम दिखाना चाहती है।",
@@ -306,10 +316,10 @@ Locales.zh = {
 	["district.moon_bazaar.name"]     = "月亮集市",
 	["district.moon_bazaar.tagline"]  = "香料、星辰、故事。",
 
-	["npc.mira.greeting"]    = "你好！我是米拉。需要任务帮助吗？",
-	["npc.tomo.greeting"]    = "旅行商人来来去去。看看我的商品！",
-	["npc.werftmeister.greeting"] = "船只需要木材、风帆和耐心。你想帮忙吗？",
-	["npc.kapitaen.greeting"] = "从这儿能看到整个港口。美丽，对吧？",
+	["npc.hafenwirtin.greeting"]    = "你好！我是米拉。需要任务帮助吗？",
+	["npc.yuki.greeting"]    = "旅行商人来来去去。看看我的商品！",
+	["npc.maja.greeting"] = "船只需要木材、风帆和耐心。你想帮忙吗？",
+	["npc.nils.greeting"] = "从这儿能看到整个港口。美丽，对吧？",
 
 	["quest.hh_01.title"]       = "第一台起重机",
 	["quest.hh_01.description"] = "米拉想给你展示港口起重机是怎么工作的。",
@@ -352,10 +362,10 @@ Locales.ja = {
 	["district.moon_bazaar.name"]     = "ムーン・バザール",
 	["district.moon_bazaar.tagline"]  = "スパイス、星、物語。",
 
-	["npc.mira.greeting"]    = "こんにちは！ミラです。クエストで助けが必要？",
-	["npc.tomo.greeting"]    = "旅する商人たちは来ては去っていく。俺の品を見てくれ！",
-	["npc.werftmeister.greeting"] = "船には木と帆と忍耐がいる。手伝えるか？",
-	["npc.kapitaen.greeting"] = "ここからは港全体が見える。美しいだろ？",
+	["npc.hafenwirtin.greeting"]    = "こんにちは！ミラです。クエストで助けが必要？",
+	["npc.yuki.greeting"]    = "旅する商人たちは来ては去っていく。俺の品を見てくれ！",
+	["npc.maja.greeting"] = "船には木と帆と忍耐がいる。手伝えるか？",
+	["npc.nils.greeting"] = "ここからは港全体が見える。美しいだろ？",
 
 	["quest.hh_01.title"]       = "初めてのクレーン",
 	["quest.hh_01.description"] = "ミラが港のクレーンの動かし方を見せてくれる。",
@@ -398,10 +408,10 @@ Locales.ar = {
 	["district.moon_bazaar.name"]     = "بازار القمر",
 	["district.moon_bazaar.tagline"]  = "توابل، نجوم، حكايات.",
 
-	["npc.mira.greeting"]    = "مرحباً! أنا ميرا. هل تحتاج مساعدة في مهمة؟",
-	["npc.tomo.greeting"]    = "التجار المسافرون يأتون ويذهبون. تصفح بضاعتي!",
-	["npc.werftmeister.greeting"] = "القوارب تحتاج خشباً وأشرعة وصبراً. هل تساعد؟",
-	["npc.kapitaen.greeting"] = "من هنا يمكنك رؤية الميناء كله. أليس جميلاً؟",
+	["npc.hafenwirtin.greeting"]    = "مرحباً! أنا ميرا. هل تحتاج مساعدة في مهمة؟",
+	["npc.yuki.greeting"]    = "التجار المسافرون يأتون ويذهبون. تصفح بضاعتي!",
+	["npc.maja.greeting"] = "القوارب تحتاج خشباً وأشرعة وصبراً. هل تساعد؟",
+	["npc.nils.greeting"] = "من هنا يمكنك رؤية الميناء كله. أليس جميلاً؟",
 
 	["quest.hh_01.title"]       = "الرافعة الأولى",
 	["quest.hh_01.description"] = "ميرا تريد أن تُريك كيف تعمل رافعات الميناء.",

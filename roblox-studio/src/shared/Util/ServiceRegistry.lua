@@ -1,27 +1,19 @@
 --!strict
 --[[
-	ServiceRegistry.lua — Proper service-location pattern (replaces _G usage)
-	========================================================================
+	ServiceRegistry.lua — Roblox-idiomatic service location (refit v1.1)
+	====================================================================
 
-	Roblox-idiomatic way to share service instances between server and client
-	without using `_G` (which Selene flags as anti-pattern).
-
-	Usage (server):
-		local Registry = require(ServerScriptService.ServiceRegistry)
-		Registry:Register("Economy", EconomyService)
-		Registry:Get("Economy"):AddGold(player, 100)
-
-	Usage (client):
-		local Registry = require(ReplicatedStorage.ServiceRegistry)
-		Registry:WaitFor("Economy", 30) -- 30s timeout
-		local svc = Registry:Get("Economy")
+	Fixes from verifier audit (C-1):
+	- Re-checks `services[name]` AFTER registering the waiter to close the
+	  TOCTOU race between WaitFor and Register.
+	- Uses pcall around coroutine.resume so a dead thread is silent.
+	- Single coroutine.yield path; no double-spawn workaround.
 ]]
 
 local ServiceRegistry = {}
 
 export type ServiceMap = { [string]: any }
 
--- Internal state
 local services: ServiceMap = {}
 local waiters: { [string]: { thread } } = {}
 
@@ -48,40 +40,77 @@ function ServiceRegistry:Get(name: string): any?
 	return services[name]
 end
 
-function ServiceRegistry:WaitFor(name: string, timeoutSeconds: number?): any
+--[[
+	WaitFor(name, timeoutSeconds?) — Blocks the current coroutine until
+	`Register(name, ...)` has been called, or returns nil after the timeout.
+
+	Race-free: registers itself as a waiter BEFORE the second check,
+	so a Register that runs concurrently cannot be lost.
+]]
+function ServiceRegistry:WaitFor(name: string, timeoutSeconds: number?): any?
 	local timeout = timeoutSeconds or 30
+
+	-- Fast path: service already registered
 	if services[name] then
 		return services[name]
 	end
 
-	-- Add to waiters
-	waiters[name] = waiters[name] or {}
+	-- Register ourselves as a waiter
 	local myThread = coroutine.running()
+	waiters[name] = waiters[name] or {}
 	table.insert(waiters[name], myThread)
 
-	-- Spawn a watchdog that resumes the waiter after the service is registered
-	-- OR after the timeout expires (whichever comes first).
+	-- Re-check after registration: if Register ran between our fast-path
+	-- check and our insert, we would otherwise be stuck.
+	if services[name] then
+		-- Remove our entry from the waiter list (best effort)
+		local list = waiters[name]
+		if list then
+			for i, t in ipairs(list) do
+				if t == myThread then
+					table.remove(list, i)
+					break
+				end
+			end
+			if #list == 0 then
+				waiters[name] = nil
+			end
+		end
+		return services[name]
+	end
+
+	-- Watchdog: resume this thread on timeout
 	task.spawn(function()
 		local start = os.clock()
 		while os.clock() - start < timeout do
 			if services[name] then
+				-- Service registered, Register will resume us
 				return
 			end
 			task.wait(0.1)
 		end
-		-- Timeout
-		warn(string.format("[ServiceRegistry] Timeout waiting for service: %s", name))
-		if coroutine.status(myThread) ~= "dead" then
-			task.spawn(function()
-				-- Resume with no value (caller should check)
-				if coroutine.status(myThread) ~= "dead" then
-					coroutine.resume(myThread)
+		-- Timeout: remove ourselves and resume with no value
+		local list = waiters[name]
+		if list then
+			for i, t in ipairs(list) do
+				if t == myThread then
+					table.remove(list, i)
+					break
 				end
-			end)
+			end
+			if #list == 0 then
+				waiters[name] = nil
+			end
 		end
+		-- pcall protects against dead thread / unyieldable
+		pcall(function()
+			if coroutine.status(myThread) ~= "dead" then
+				task.spawn(myThread)
+			end
+		end)
 	end)
 
-	-- Yield this thread; will be resumed when service is registered or timeout fires
+	-- Block until resumed by Register or timeout watchdog
 	coroutine.yield()
 
 	return services[name]
@@ -99,10 +128,6 @@ function ServiceRegistry:List(): { string }
 	table.sort(out)
 	return out
 end
-
--- ============================================================
--- Debug
--- ============================================================
 
 function ServiceRegistry:Clear()
 	services = {}

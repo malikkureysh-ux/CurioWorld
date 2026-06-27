@@ -27,12 +27,25 @@ local function setupHud()
 	local player = Players.LocalPlayer
 	local economy = ServiceRegistry:WaitFor("Economy", 30)
 	if not economy then
-		Log:Warn("EconomyService not available, HUD will retry on first server event")
+		Log:Warn("EconomyService not available after 30s timeout, HUD will retry on first server event")
+		-- Defensive: do NOT call any method on a nil service
+		-- The user can still play; HUD will retry via event later
 		return
 	end
 
+	-- Type guard: WaitFor returns any? — verify before calling
+	if type(economy) ~= "table" and type(economy) ~= "userdata" then
+		Log:Warn("EconomyService registered but is not callable:", typeof(economy))
+		return
+	end
+
+	-- Safe: GetBalance always returns a Wallet table
 	local wallet = economy:GetBalance(player)
-	Log:Info("Wallet loaded:", wallet)
+	if wallet then
+		Log:Info("Wallet loaded:", wallet)
+	else
+		Log:Warn("Wallet is nil after GetBalance (should not happen)")
+	end
 	-- TODO Phase 3: roact-based HUD widgets
 end
 

@@ -14,6 +14,9 @@
         },
         "Util": {
           "$folder": "src/shared/Util"
+        },
+        "Tests": {
+          "$folder": "src/tests"
         }
       },
       "Locale": {
@@ -27,6 +30,9 @@
       },
       "init.server.lua": {
         "$path": "src/server/init.server.lua"
+      },
+      "TestRunner": {
+        "$path": "src/server/TestRunner.server.lua"
       }
     },
     "StarterPlayer": {

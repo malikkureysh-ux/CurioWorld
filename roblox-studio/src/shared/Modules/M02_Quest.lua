@@ -19,7 +19,7 @@ local M02_Quest = {}
 -- Datenmodell
 -- ============================================================
 
-export type QuestStepType = "objective" | "dialogue" | "puzzle" | "collect"
+export type QuestStepType = "objective" | "dialogue" | "puzzle" | "collect" | "build" | "team"
 
 export type QuestStep = {
 	id: string,
@@ -58,6 +58,7 @@ M02_Quest.SampleQuests = {
 	-- ============================================================
 	-- HH_01: Kran-Intro (Einstiegsquest, alle Altersbänder)
 	-- Lernziele: Hebelgesetz (Physik), Mengenpriorisierung (Mathe)
+	-- Quest-Giver: Hafenwirtin Lina (HH PlazaEntry, main NPC)
 	-- ============================================================
 	["HH_01_kran_intro"] = {
 		id = "HH_01_kran_intro",
@@ -67,9 +68,9 @@ M02_Quest.SampleQuests = {
 		district = "HamburgHarbor",
 		steps = {
 			{
-				id = "step_1_meet_mira",
+				id = "step_1_meet_hafenwirtin",
 				type = "dialogue",
-				target = "Mira",
+				target = "Hafenwirtin",
 				completion_condition = function(_, _) return true end,
 			},
 			{
@@ -144,6 +145,7 @@ M02_Quest.SampleQuests = {
 	-- ============================================================
 	-- HH_03: Werft-Bootsbau (Teamwork-Quest)
 	-- Lernziele: Team-Koordination, Werkzeug-Reihenfolge (Planung)
+	-- Quest-Giver: Bootsbauerin Maja (HH Werft)
 	-- ============================================================
 	["HH_03_werft_boat"] = {
 		id = "HH_03_werft_boat",
@@ -151,6 +153,7 @@ M02_Quest.SampleQuests = {
 		description_key = "quest.hh_03.description",
 		type = "team",
 		district = "HamburgHarbor",
+		quest_giver = "Maja",
 		min_team_size = 2,
 		max_team_size = 4,
 		steps = {

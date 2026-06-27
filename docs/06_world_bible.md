@@ -174,14 +174,19 @@ Curio World Stadt
    - Ventile richtig einstellen (Physik).
    - Symbole in Reihenfolge bringen (Logik, Mathematik).
 
-**NPCs (vollständige Liste für Vertical Slice):**
+**NPCs (Vertical-Slice-Roster, 4 fokussierte Rollen):**
 
-- **Käpt'n Lina** (Hafenmeisterin). Vergibt Hauptquests, ist freundlich und kompetent, spricht mit kleinen Ermutigungen.
-- **Werkstatt-Meister Otto**. Erklärt physikalische Symbole kindgerecht.
-- **Bootsbauerin Maja**. Leitet die Werft-Community-Quest.
-- **Markt-Händlerin Yuki** (international inspiriert). Bietet Deko und saisonale Items; nutzt englische Code-Wörter in Dialogen.
-- **Leuchtturm-Wächter Nils**. Mysteriöser Begleiter, gibt Hinweise auf Geheimnisse.
-- **Hafen-Katze Sumi**. Begleiter-Pet, das durch Erkundung gefunden wird; kosmetisch.
+Für die Hamburg-Harbor-Vertical-Slice (Phase 2-4) sind folgende 4 NPCs aktiv:
+
+- **Hafenwirtin Lina** (ehem. „Käpt'n Lina"). Hauptquest-Geberin am PlazaEntry, freundlich + kompetent, kleine Ermutigungen. Anker der Spieler-Questline.
+- **Markt-Händlerin Yuki** (ehem. „Markt-Händlerin Yuki"). Im Speicherhaus, Deko + saisonale Items, nutzt englische Code-Wörter in Dialogen.
+- **Bootsbauerin Maja** (ehem. „Bootsbauerin Maja"). Leitet die Werft-Community-Quest (HH_03).
+- **Leuchtturmwächter Nils** (ehem. „Leuchtturm-Wächter Nils"). Mysteriöser Begleiter am Leuchtturm, gibt Hinweise auf Geheimnisse.
+
+**Post-Launch-Erweiterung (Phase 5+, NICHT im Vertical Slice):**
+
+- **Werkstatt-Meister Otto** — wird in einem späteren Sprint hinzugefügt, um Physik-Tutorials zu vertiefen.
+- **Hafen-Katze Sumi** — Begleiter-Pet, das durch Erkundung gefunden wird; kosmetisch (Companion-Item in Phase 5).
 
 **Geheimnisse:**
 - Eine vergessene „Kompagnon-Werft" tief im Hafenbecken, erreichbar durch ein Kombinations-Puzzle.
