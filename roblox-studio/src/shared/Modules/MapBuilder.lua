@@ -13,8 +13,6 @@
 ]]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
-local Workspace = game:GetService("Workspace")
 
 local Log = require(ReplicatedStorage.Shared.Util.Log)
 
@@ -92,7 +90,7 @@ end
 	Validate(mapData) — Prüft die Map-Daten auf offensichtliche Fehler.
 	Hilfreich in TestEZ-Specs.
 ]]
-function MapBuilder:Validate(mapData: { [string]: any }): { [string]: boolean }, { string }
+function MapBuilder:Validate(mapData: { [string]: any }): (boolean, { string })
 	local errors: { string } = {}
 
 	if not mapData.Name or mapData.Name == "" then
