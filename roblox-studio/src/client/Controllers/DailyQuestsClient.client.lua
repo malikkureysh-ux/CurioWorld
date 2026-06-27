@@ -217,16 +217,39 @@ local function showDailyQuests(player, quests)
 
 		acceptBtn.MouseButton1Click:Connect(function()
 			Log:Info(("[DailyQuestsClient] Accepted: %s"):format(quest.id))
-			-- Visuelles Feedback
-			TweenService:Create(acceptBtn,
-				TweenInfo.new(0.15, Enum.EasingStyle.Quad),
-				{ BackgroundColor3 = Color3.fromRGB(80, 200, 120) }):Play()
-			acceptBtn.Text = "✓"
-			task.delay(0.5, function()
-				if acceptBtn.Parent then
-					acceptBtn.Text = Localization:GetString(player, "ui.dialogue.accept", {})
+
+			-- Server-Aufruf: ClaimDailyQuest
+			local claimRemote = ReplicatedStorage:FindFirstChild("MapInteractionRemotes")
+				and ReplicatedStorage.MapInteractionRemotes:FindFirstChild("ClaimDailyQuest")
+			if claimRemote then
+				local ok, err = claimRemote:InvokeServer(quest.id)
+				if ok then
+					-- Erfolgs-Feedback: grünes Flash + ✓
+					TweenService:Create(acceptBtn,
+						TweenInfo.new(0.15, Enum.EasingStyle.Quad),
+						{ BackgroundColor3 = Color3.fromRGB(80, 200, 120) }):Play()
+					acceptBtn.Text = "✓"
+					-- Disable-Button nach Claim
+					acceptBtn.Active = false
+				else
+					-- Failure-Feedback: rotes Flash + Error-Message
+					TweenService:Create(acceptBtn,
+						TweenInfo.new(0.15, Enum.EasingStyle.Quad),
+						{ BackgroundColor3 = Color3.fromRGB(180, 60, 60) }):Play()
+					acceptBtn.Text = "✗"
+					Log:Warn(("[DailyQuestsClient] Claim rejected: %s"):format(tostring(err)))
+					task.delay(1.5, function()
+						if acceptBtn.Parent then
+							acceptBtn.Text = Localization:GetString(player, "ui.dialogue.accept", {})
+							TweenService:Create(acceptBtn,
+								TweenInfo.new(0.2, Enum.EasingStyle.Quad),
+								{ BackgroundColor3 = DailyQuestsClient.Theme.Accent }):Play()
+						end
+					end)
 				end
-			end)
+			else
+				Log:Warn("[DailyQuestsClient] ClaimDailyQuest remote not found")
+			end
 		end)
 	end
 

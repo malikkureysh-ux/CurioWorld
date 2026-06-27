@@ -244,10 +244,75 @@ function DailyQuestService:AwardDailyQuest(player: Player, dailyQuestId: string)
 	end
 end
 
+-- ============================================================
+-- Claim-Accept (Player klickt "Annehmen" auf Tagesaufgabe)
+-- ============================================================
+
+function DailyQuestService:ClaimDailyQuest(player: Player, dailyQuestId: string): (boolean, string?)
+	local pid = "user_" .. tostring(player.UserId)
+	if not pid then return false, "invalid_player" end
+
+	-- Verify quest is in today's pool
+	local todays = self:GetTodaysQuests(player)
+	local valid = false
+	for _, q in ipairs(todays) do
+		if q.id == dailyQuestId then
+			valid = true
+			break
+		end
+	end
+	if not valid then
+		return false, "not_in_today_pool"
+	end
+
+	-- Check if already claimed today
+	claimedDailyQuests[pid] = claimedDailyQuests[pid] or {}
+	if claimedDailyQuests[pid][dailyQuestId] then
+		return false, "already_claimed"
+	end
+
+	-- Mark claimed
+	claimedDailyQuests[pid][dailyQuestId] = true
+
+	-- Start the underlying quest in QuestService
+	local ServiceRegistry = require(ReplicatedStorage.Shared.Util.ServiceRegistry)
+	local questService = ServiceRegistry:Get("Quest")
+	if questService then
+		-- Daily-Quests nutzen den NPC-Namen oder Zone-Namen als Quest-ID
+		local quest = todays[1]  -- Already validated above
+		for _, q in ipairs(todays) do
+			if q.id == dailyQuestId then
+				-- Starte eine passende Main-Quest basierend auf Daily-Quest-Typ
+				if q.type == "dialogue" and q.target then
+					-- z.B. "DQ_talk_yuki" → mark NPC talked
+					questService:MarkNpcTalked(player, q.target)
+				end
+				break
+			end
+		end
+	end
+
+	Log:Info(("[DailyQuest] %s claimed %s"):format(player.Name, dailyQuestId))
+	return true, nil
+end
+
+function DailyQuestService:IsDailyQuestClaimed(player: Player, dailyQuestId: string): boolean
+	local pid = "user_" .. tostring(player.UserId)
+	if not pid then return false end
+	return claimedDailyQuests[pid] ~= nil
+		and claimedDailyQuests[pid][dailyQuestId] == true
+end
+
+-- Wire RemoteFunction handler
+remoteClaimDailyQuest.OnServerInvoke = function(player, dailyQuestId)
+	return DailyQuestService:ClaimDailyQuest(player, dailyQuestId)
+end
+
 -- Cleanup
 Players.PlayerRemoving:Connect(function(player)
 	local pid = "user_" .. tostring(player.UserId)
 	playerDailyQuests[pid] = nil
+	claimedDailyQuests[pid] = nil
 end)
 
 return DailyQuestService
