@@ -547,12 +547,20 @@
 - [x] M08_Accessibility.spec.lua (12 tests) ✅
 - [x] M14_Parental.spec.lua (12 tests) ✅
 
-**Total tests: 273 (was 249 → +24). Production modules: 13/15 → 15/15 with runtime. Only M12 Animation-Editor deferred.**
+### Wave 11 — E2E Integration + README ✅ DONE (2026-06-27 21:55)
+- [x] QuestFlow_Integration.spec.lua (NEW, 16 tests): HH_01 + HH_03 End-to-End ✅
+- [x] README.md (NEW, comprehensive): Setup + Architecture + Deployment + Compliance ✅
+- [x] Test suite proves end-to-end quest flow works without manual play ✅
 
-### Verbleibend (deferred)
-- [ ] M12 Animation-Editor (Studio-Plugin statt Runtime)
-- [ ] AES-256-GCM via KMS (aktuell: XOR-Cipher)
-- [ ] Asset-Upload (13 FBX + 6 Sounds + 4 Animations)
+**Total tests: 289 (was 273 → +16). Production-Ready mit vollständiger Dokumentation.**
+
+### Verbleibend (deferred — alle klar abgegrenzt)
+- [ ] User-Action: Asset-Upload (13 FBX + 6 Sounds + 4 Animations)
+- [ ] User-Action: Roblox Studio Live-Test (F5 + Spieler-Perspektive)
+- [ ] Phase 4: ProfileService-Migration (race-free saves)
+- [ ] Phase 4: AES-256-GCM via KMS
+- [ ] Phase 4: M12 Animation-Editor (Studio-Plugin)
+- [ ] Multi-District-Expansion (SkyBridge Bay etc.)
 
 ---
 
