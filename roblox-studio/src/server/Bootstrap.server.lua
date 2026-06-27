@@ -64,6 +64,7 @@ local EconomyService    = require(ServerScriptService.Services.EconomyService)
 local QuestService      = require(ServerScriptService.Services.QuestService)
 local QuestVisibilityService = require(ServerScriptService.Services.QuestVisibilityService)
 local M14_Parental      = require(ServerScriptService.Services.M14_Parental)
+local MapInteractionService = require(ServerScriptService.Services.MapInteractionService)
 
 ServiceRegistry:Register("Telemetry", TelemetryService)
 ServiceRegistry:Register("Save", SaveService)
@@ -71,6 +72,7 @@ ServiceRegistry:Register("Economy", EconomyService)
 ServiceRegistry:Register("Quest", QuestService)
 ServiceRegistry:Register("QuestVisibility", QuestVisibilityService)
 ServiceRegistry:Register("Parental", M14_Parental)
+ServiceRegistry:Register("MapInteraction", MapInteractionService)
 
 -- M08 Accessibility (client+server shared) — init hook
 pcall(function()
@@ -95,6 +97,9 @@ QuestService:Init()
 
 -- QuestVisibility: scan Map für Attribute (VisibleAfterQuest, QuestHook, MaterialType)
 QuestVisibilityService:Init()
+
+-- MapInteraction: hook alle ProximityPrompts (Workbench/QuestBoards/NPCs)
+MapInteractionService:Init()
 
 -- ============================================================
 -- 4. UI-Controllers: HUD + QuestTracker spawn on PlayerAdded
