@@ -203,6 +203,7 @@ function MapBuilder:Validate(mapData: { [string]: any }): (boolean, { string })
 		-- Class-spezifische Checks
 		local className = node.ClassName
 		local isNpcSpawn = node.Attributes and node.Attributes.NpcId ~= nil
+		local isPickupable = node.Attributes and node.Attributes.Pickupable == true
 
 		if node.Properties then
 			local props = node.Properties
@@ -219,8 +220,8 @@ function MapBuilder:Validate(mapData: { [string]: any }): (boolean, { string })
 				end
 			end
 
-			-- Anchored=true für statische Map (außer NPC-Spawn-Cubes)
-			if CLASSES_REQUIRING_ANCHORED[className] and not isNpcSpawn then
+			-- Anchored=true für statische Map (außer NPC-Spawn-Cubes und Pickupable-Items)
+			if CLASSES_REQUIRING_ANCHORED[className] and not isNpcSpawn and not isPickupable then
 				if props.Anchored == false then
 					table.insert(errors, path .. ": Anchored=false für statisches " .. className .. " (Sturz-Risiko)")
 				end
@@ -241,8 +242,13 @@ function MapBuilder:Validate(mapData: { [string]: any }): (boolean, { string })
 
 		-- Model: PrimaryPart-Validierung
 		-- Models mit Children brauchen einen PrimaryPart (sonst Crash bei :MoveTo etc.)
+		-- PrimaryPart kann top-level oder in Properties sein (Roblox-API hat beides)
 		if className == "Model" and node.Children and #node.Children > 0 then
-			if not node.PrimaryPart then
+			local pp = node.PrimaryPart
+			if not pp and node.Properties and node.Properties.PrimaryPart then
+				pp = node.Properties.PrimaryPart
+			end
+			if not pp then
 				table.insert(errors, path
 					.. ": Model hat Children aber keinen PrimaryPart gesetzt"
 					.. " (bitte in Studio nach Build zuweisen)")
