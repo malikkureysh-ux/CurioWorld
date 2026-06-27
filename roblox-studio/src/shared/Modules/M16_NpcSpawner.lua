@@ -26,6 +26,14 @@ local Log = require(ReplicatedStorage.Shared.Util.Log)
 local ServiceRegistry = require(ReplicatedStorage.Shared.Util.ServiceRegistry)
 
 local M16_NpcSpawner = {}
+-- M22 wird in attachProximityPrompt geladen; hier nur lokaler Init-Hook
+local M22_AnimationController
+pcall(function()
+	M22_AnimationController = require(ReplicatedStorage.Shared.Modules.M22_AnimationController)
+	if M22_AnimationController and M22_AnimationController.Init then
+		M22_AnimationController:Init()
+	end
+end)
 
 -- ============================================================
 -- NPC-Definition (statisch — könnte in Phase 3 aus Data geladen werden)
@@ -268,6 +276,12 @@ function M16_NpcSpawner:SpawnAll(districtsFolder: Folder): { [string]: Model }
 			if model then
 				model.Parent = descendant.Parent  -- direkt neben dem Spawn-Anker
 				attachProximityPrompt(model, npcId)
+				-- Animation-Idle abspielen wenn M22 verfügbar
+				if M22_AnimationController and M22_AnimationController.PlayNpcIdle then
+					pcall(function()
+						M22_AnimationController:PlayNpcIdle(model)
+					end)
+				end
 				Log:Info(string.format("[M16] NPC '%s' gespawnt", npcId))
 			end
 		end

@@ -255,8 +255,10 @@ function M20_Shop:Show(player: Player)
 	local playerGold = 0
 	local playerIsVip = false
 	pcall(function()
-		local balance = M07_Economy:GetBalance and M07_Economy:GetBalance(player) or nil
-		if balance then playerGold = balance.gold or 0 end
+		if M07_Economy.GetBalance then
+			local balance = M07_Economy:GetBalance(player)
+			if balance then playerGold = balance.gold or 0 end
+		end
 	end)
 
 	-- Add items

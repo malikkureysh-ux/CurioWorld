@@ -517,8 +517,8 @@ local HamburgHarbor = {
 						  },
 						  Attributes = { VfxType = "LanternDust" },
 					  },
-				  }},
-	},
+				  },
+		},
 }
 
 return HamburgHarbor
