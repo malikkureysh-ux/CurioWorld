@@ -61,10 +61,12 @@ end
 local TelemetryService = require(ServerScriptService.Services.TelemetryService)
 local SaveService       = require(ServerScriptService.Services.SaveService)
 local EconomyService    = require(ServerScriptService.Services.EconomyService)
+local QuestVisibilityService = require(ServerScriptService.Services.QuestVisibilityService)
 
 ServiceRegistry:Register("Telemetry", TelemetryService)
 ServiceRegistry:Register("Save", SaveService)
 ServiceRegistry:Register("Economy", EconomyService)
+ServiceRegistry:Register("QuestVisibility", QuestVisibilityService)
 
 -- ============================================================
 -- 3. NPC-Spawn (uses Map + emits ProximityPrompts for UI-Trigger)
@@ -77,6 +79,9 @@ if harborContainer then
 	for _ in pairs(spawnedNpcs) do count += 1 end
 	Log:Info(("NPCs gespawnt: %d"):format(count))
 end
+
+-- QuestVisibility: scan Map für Attribute (VisibleAfterQuest, QuestHook, MaterialType)
+QuestVisibilityService:Init()
 
 -- ============================================================
 -- 4. UI-Controllers: HUD + QuestTracker spawn on PlayerAdded

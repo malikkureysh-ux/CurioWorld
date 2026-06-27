@@ -452,6 +452,20 @@ local HamburgHarbor = {
 					  MeshId = "rbxassetid://PENDING_UPLOAD_laterne_lod0",
 					  Size = Vector3.new(0.5, 3.5, 0.5),
 					  Position = Vector3.new(-10, 1.75, -5),
+				  },
+				  Children = {
+					  {
+						  Name = "LanternGlow",
+						  ClassName = "PointLight",
+						  Properties = {
+							  Color = Color3.fromRGB(255, 220, 110),
+							  Brightness = 1.2,
+							  Range = 14,
+							  Enabled = true,
+							  ShadowsEnabled = true,
+						  },
+						  Attributes = { VfxType = "LanternGlow" },
+					  },
 				  }},
 				{ Name = "Lantern_2", ClassName = "MeshPart",
 				  Properties = {
@@ -459,6 +473,20 @@ local HamburgHarbor = {
 					  MeshId = "rbxassetid://PENDING_UPLOAD_laterne_lod0",
 					  Size = Vector3.new(0.5, 3.5, 0.5),
 					  Position = Vector3.new(-15, 1.75, 10),
+				  },
+				  Children = {
+					  {
+						  Name = "LanternGlow",
+						  ClassName = "PointLight",
+						  Properties = {
+							  Color = Color3.fromRGB(255, 220, 110),
+							  Brightness = 1.2,
+							  Range = 14,
+							  Enabled = true,
+							  ShadowsEnabled = true,
+						  },
+						  Attributes = { VfxType = "LanternGlow" },
+					  },
 				  }},
 				{ Name = "Lantern_3", ClassName = "MeshPart",
 				  Properties = {
@@ -466,6 +494,20 @@ local HamburgHarbor = {
 					  MeshId = "rbxassetid://PENDING_UPLOAD_laterne_lod0",
 					  Size = Vector3.new(0.5, 3.5, 0.5),
 					  Position = Vector3.new(10, 1.75, 0),
+				  },
+				  Children = {
+					  {
+						  Name = "LanternGlow",
+						  ClassName = "PointLight",
+						  Properties = {
+							  Color = Color3.fromRGB(255, 220, 110),
+							  Brightness = 1.2,
+							  Range = 14,
+							  Enabled = true,
+							  ShadowsEnabled = true,
+						  },
+						  Attributes = { VfxType = "LanternGlow" },
+					  },
 				  }},
 				{ Name = "Lantern_4", ClassName = "MeshPart",
 				  Properties = {
@@ -473,6 +515,20 @@ local HamburgHarbor = {
 					  MeshId = "rbxassetid://PENDING_UPLOAD_laterne_lod0",
 					  Size = Vector3.new(0.5, 3.5, 0.5),
 					  Position = Vector3.new(20, 1.75, 25),
+				  },
+				  Children = {
+					  {
+						  Name = "LanternGlow",
+						  ClassName = "PointLight",
+						  Properties = {
+							  Color = Color3.fromRGB(255, 220, 110),
+							  Brightness = 1.2,
+							  Range = 14,
+							  Enabled = true,
+							  ShadowsEnabled = true,
+						  },
+						  Attributes = { VfxType = "LanternGlow" },
+					  },
 				  }},
 				{ Name = "Lantern_5", ClassName = "MeshPart",
 				  Properties = {

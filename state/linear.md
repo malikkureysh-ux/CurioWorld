@@ -499,17 +499,21 @@
 - [ ] Asset upload (13 FBX, 6 sounds, 4 animations) — User-Action
 - [ ] Roblox Studio publishing + testing in real Roblox client
 
-### Wave 6 — Premium Polish (next)
-- [ ] QuestDetail client-side modal (consumes QuestDetailRemote)
-- [ ] Real-Time audio volume propagation from M24 → SoundService
-- [ ] Settings accessibility actually affects UI (ReducedMotion, HighContrast)
-- [ ] Bootstrap-client (currently empty folder): add LocalScript with QuestDetail listener
-- [ ] Smooth slide-in animations on M19/M20 (M18 already done)
-- [ ] Sound-Effekt beim Kauf (M20)
-- [ ] Typewriter-Effekt im M18 Dialog
-- [ ] Address 7 missing items: Boot Animation caller, Boat_Built visibility toggle,
-       Island_Base mesh, MaterialStorage pickup consumer, Workbench quest hook consumer,
-       QuestBoards refresh logic, Lantern_1-4 missing PointLights
+### Wave 6 — Premium Polish ✅ DONE (2026-06-27 21:30)
+- [x] QuestDetail client-side modal (consumes QuestDetailRemote) ✅
+- [x] Real-Time audio volume propagation from M24 → SoundService ✅
+- [x] Bootstrap-client: 2 LocalScripts (QuestDetailController + SoundController) ✅
+- [x] Lantern_1-4 missing PointLights (alle 5 Laternen glühen jetzt uniform) ✅
+- [x] Boat_Built visibility toggle via VisibleAfterQuest ✅
+- [x] QuestVisibilityService.lua — Map-Attribute lebendig ✅
+- [x] MaterialStorage pickup (Logging, Phase 3 Inventory) ✅
+- [ ] Sound-Effekt beim Kauf (M20) ⏸ (Sound-Asset fehlt)
+- [ ] Typewriter-Effekt im M18 Dialog ⏸
+- [ ] Smooth slide-in animations on M19/M20 (M18 already done) ⏸
+- [ ] Workbench quest hook consumer (Phase 3) ⏸
+- [ ] QuestBoards refresh logic (Phase 3) ⏸
+- [ ] Island_Base mesh replacement (Phase 3) ⏸
+- [ ] Boat_Row Animation caller (Phase 3) ⏸
 
 ---
 
