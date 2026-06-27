@@ -517,8 +517,20 @@
 - [x] M16 NpcSpawner: MarkNpcTalked → QuestService ✅
 - [x] End-to-End Quest-Loop funktioniert (NPC → Dialogue → Talk → Step Advance)
 
+### Wave 8 — Phase 3 Runtime ✅ DONE (2026-06-27 21:40)
+- [x] M03 Dialogue Engine: Start/Choose/End + 4 sample dialogues ✅
+- [x] M06 Inventory: Add/Remove/Has + Stack-merge + CollectionBook ✅
+- [x] QuestService.hasItem now uses M06_Inventory:Has (was hardcoded false) ✅
+- [x] QuestService.AwardReward: Gold/Gems/Companion/Filter mit Telemetrie ✅
+- [x] QuestService.OnQuestCompleted → QuestVisibilityService → Boat_Built reveal ✅
+- [x] M16 NpcSpawner uses M03 with M18 fallback (graceful) ✅
+- [x] M03_Dialogue.spec.lua (8 tests) ✅
+- [x] M06_Inventory.spec.lua (15 tests) ✅
+
+**Total tests: 196 (was 173 → +23). Production modules: 6/15 → 9/15 with runtime.**
+
 ### Verbleibend (deferred)
-- [ ] Phase-3 Module runtime: M03/M06/M09/M10/M11 (Type-Aliase existieren)
+- [ ] Phase-3 Module runtime: M09/M10/M11 (Event/Housing/Companion)
 - [ ] AES-256-GCM via KMS (aktuell: XOR-Cipher)
 - [ ] Asset-Upload (13 FBX + 6 Sounds + 4 Animations)
 - [ ] Workbench quest hook consumer

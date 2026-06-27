@@ -20,9 +20,13 @@
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 
 local Log = require(ReplicatedStorage.Shared.Util.Log)
 local M02_Quest = require(ReplicatedStorage.Shared.Modules.M02_Quest)
+local M06_Inventory = require(ReplicatedStorage.Shared.Modules.M06_Inventory)
+local TelemetryService = require(ServerScriptService.Services.TelemetryService)
+local ServiceRegistry = require(ReplicatedStorage.Shared.Util.ServiceRegistry)
 
 local QuestService = {}
 
@@ -65,9 +69,8 @@ end
 local function buildWorldServices(): M02_Quest.WorldServices
 	return {
 		hasTalkedToNpc = hasTalkedToNpc,
-		hasItem = function(_player, _itemId, _count)
-			-- Phase 3: Inventory-Integration
-			return false
+		hasItem = function(player, itemId, count)
+			return M06_Inventory:Has(player, itemId, count)
 		end,
 		hasRecentEvent = function(_player, _eventName, _withinSeconds)
 			return false
@@ -102,8 +105,22 @@ function QuestService:Init()
 						if ok then
 							Log:Info(("[QuestService] %s advanced %s (step %d)"):format(
 								player.Name, questId, progress.current_step or "?"))
-							M02_Quest:AdvanceStep(progress)
-							-- Phase 3: reward aus QuestData.rewards austeilen
+							local advanced = M02_Quest:AdvanceStep(progress)
+							if not advanced then
+								-- Quest completed
+								local quest = M02_Quest.SampleQuests[questId]
+								if quest and quest.rewards then
+									self:AwardReward(player, quest.rewards)
+									Log:Info(("[QuestService] %s completed %s, awarded %d rewards"):format(
+										player.Name, questId, #quest.rewards))
+								end
+								-- QuestVisibility reveal
+								local questVis = ServiceRegistry:Get("QuestVisibility")
+								if questVis then
+									questVis:OnQuestCompleted(player, questId)
+								end
+								TelemetryService:Track(player, "quest.completed", { quest_id = questId })
+							end
 						end
 					end
 				end
@@ -131,6 +148,22 @@ end
 
 function QuestService:GetAllProgress(player: Player): { [string]: any }
 	return playerProgress[player] or {}
+end
+
+-- Award reward (Gold/Gems/Companion/Filter)
+function QuestService:AwardReward(player: Player, rewards: { { type: string, amount: number, item: string? } })
+	local economy = ServiceRegistry:Get("Economy")
+	for _, reward in ipairs(rewards or {}) do
+		if reward.type == "Gold" and economy then
+			economy:AddGold(player, reward.amount or 0, "quest_reward")
+		elseif reward.type == "Gems" and economy then
+			economy:AddGems(player, reward.amount or 0, "quest_reward")
+		elseif reward.type == "Companion" or reward.type == "Companion_Skin" then
+			M06_Inventory:Add(player, reward.item or "Unknown_Companion", 1)
+		elseif reward.type == "Photo_Filter" then
+			M06_Inventory:Add(player, reward.item or "Unknown_Filter", 1)
+		end
+	end
 end
 
 -- Cleanup

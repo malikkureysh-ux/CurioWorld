@@ -208,26 +208,43 @@ local function attachProximityPrompt(model: Model, npcId: string)
 		local config = M16_NpcSpawner.NpcConfig[npcId]
 		if not config then return end
 
-		-- Versuche M18 Dialogue zu laden (kann fehlen in Phase 2 wenn UI noch nicht verkabelt)
-		local ok, M18 = pcall(function()
-			return require(ReplicatedStorage.Shared.Modules.M18_Dialogue)
-		end)
-		if not ok or not M18 then
-			Log:Warn("[M16] M18_Dialogue nicht verfügbar — ProximityPrompt ohne UI-Verkabelung")
-			return
-		end
-
-		-- Lokalisierter Greeting-Text
-		local greetingKey = config.DialogueKey
-		local greetingText = greetingKey  -- Fallback = key selbst
+		-- Versuche M03 Dialogue-Engine (mit M18 als Fallback)
+		local dialogueStarted = false
 		pcall(function()
-			local M15 = require(ReplicatedStorage.Shared.Modules.M15_Localization)
-			greetingText = M15:T(greetingKey) or greetingKey
+			local M03 = require(ReplicatedStorage.Shared.Modules.M03_Dialogue)
+			local npcLower = npcId:lower()
+			-- Mapping NPC_Id → Dialogue-Id
+			local dialogueMap = {
+				Hafenwirtin = "hafenwirtin_greeting",
+				Yuki = "yuki_greeting",
+				Maja = "maja_greeting",
+				Nils = "nils_greeting",
+			}
+			local dialogueId = dialogueMap[npcId] or (npcLower .. "_greeting")
+			dialogueStarted = M03:Start(playerWhoTriggered, dialogueId)
 		end)
 
-		-- Dialogue öffnen
-		M18:Show(playerWhoTriggered, config, greetingText)
-		Log:Info(("[M16] Dialogue geöffnet für %s mit %s"):format(playerWhoTriggered.Name, npcId))
+		if not dialogueStarted then
+			-- Fallback: einfacher Greeting-Modal via M18
+			local ok18, M18 = pcall(function()
+				return require(ReplicatedStorage.Shared.Modules.M18_Dialogue)
+			end)
+			if ok18 and M18 then
+				local greetingKey = config.DialogueKey
+				local greetingText = greetingKey
+				pcall(function()
+					local M15 = require(ReplicatedStorage.Shared.Modules.M15_Localization)
+					greetingText = M15:T(greetingKey) or greetingKey
+				end)
+				M18:Show(playerWhoTriggered, config, greetingText)
+				Log:Info(("[M16] Fallback M18 Dialogue für %s mit %s"):format(playerWhoTriggered.Name, npcId))
+			else
+				Log:Warn("[M16] Weder M03 noch M18 verfügbar — ProximityPrompt ohne UI-Verkabelung")
+				return
+			end
+		else
+			Log:Info(("[M16] Dialogue geöffnet für %s mit %s (M03)"):format(playerWhoTriggered.Name, npcId))
+		end
 
 		-- Mark NPC-Talked: triggert Quest-Validators (hasTalkedToNpc)
 		pcall(function()
