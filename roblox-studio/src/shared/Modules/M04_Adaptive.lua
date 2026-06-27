@@ -94,8 +94,12 @@ function M04_Adaptive:RecordSignal(profile: CompetencyProfile, domain: Domain, s
 	-- Bayesian-Update (vereinfacht): +level wenn Erfolg, -level wenn Misserfolg.
 	-- Hint-Nutzung und hohe Attempts dämpfen den Sprung.
 	local delta = signal.success and 0.04 or -0.03
-	if signal.hint_used then delta *= 0.5 end
-	if signal.attempts > 3 then delta *= 0.5 end
+	if signal.hint_used then
+		delta *= 0.5
+	end
+	if signal.attempts > 3 then
+		delta *= 0.5
+	end
 
 	d.level = math.max(0.0, math.min(1.0, d.level + delta))
 
@@ -120,7 +124,7 @@ function M04_Adaptive:Recommend(profile: CompetencyProfile, domain: Domain): Ada
 	local suggestedDifficulty = math.max(0.1, math.min(0.9, d.level - 0.05))
 
 	-- HelpDepth: mehr Hilfe bei niedrigem Confidence.
-	local helpDepth: AdaptiveRecommendation.HelpDepth
+	local helpDepth: "none" | "subtle" | "gentle" | "clear"
 	if d.confidence < 0.2 then
 		helpDepth = "clear"
 	elseif d.confidence < 0.5 then
@@ -132,7 +136,7 @@ function M04_Adaptive:Recommend(profile: CompetencyProfile, domain: Domain): Ada
 	end
 
 	-- Language: passt zur Alters-Schätzung (Phase 3: aus Input-Mustern ableiten).
-	local languageComplexity: AdaptiveRecommendation.LanguageComplexity
+	local languageComplexity: "simple" | "standard" | "advanced"
 	if d.level < 0.3 then
 		languageComplexity = "simple"
 	elseif d.level < 0.7 then
@@ -142,7 +146,7 @@ function M04_Adaptive:Recommend(profile: CompetencyProfile, domain: Domain): Ada
 	end
 
 	-- Pacing: bei steigender Tendenz etwas schneller, sonst normal.
-	local pacing: AdaptiveRecommendation.PacingHint
+	local pacing: "slower" | "normal" | "faster"
 	if d.recent_trend == "rising" then
 		pacing = "faster"
 	elseif d.recent_trend == "falling" then

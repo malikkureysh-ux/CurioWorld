@@ -45,7 +45,9 @@ function M13_Moderation:CanSendMessage(band: AgeBand, message: string): (boolean
 	if perms.CanUseShortText then
 		-- Kurze Sätze: max. 6 Wörter, kein Caps-Lock, keine URLs
 		local wordCount = 0
-		for _ in string.gmatch(message, "%S+") do wordCount += 1 end
+		for _ in string.gmatch(message, "%S+") do
+			wordCount += 1
+		end
 		if wordCount > 6 then return false, "too_many_words" end
 		return true, nil
 	end

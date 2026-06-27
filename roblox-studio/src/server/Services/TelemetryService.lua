@@ -14,6 +14,9 @@
 
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Log = require(ReplicatedStorage.Shared.Util.Log)
 
 local TelemetryService = {}
 
@@ -59,19 +62,17 @@ function TelemetryService:Track(player: Player, eventName: string, properties: {
 	end
 
 	-- Dev-Logging (kann in Production auf DEBUG-Level gestellt werden)
-	if _G.CURIO_WORLD_DEBUG then
-		print(string.format("[Telemetry] %s pid=%s", eventName, entry.pid))
-	end
+	Log:Debug(string.format("[Telemetry] %s pid=%s", eventName, entry.pid))
 end
 
 function TelemetryService:Flush()
 	if #buffer == 0 then return end
 
 	-- Phase 2: Console-Log. Phase 3: HTTP-POST an Backend.
-	if _G.CURIO_WORLD_DEBUG then
-		print(string.format("[Telemetry] Flushing %d events", #buffer))
+	if Log:GetLevel() == "Debug" then
+		Log:Debug(string.format("[Telemetry] Flushing %d events", #buffer))
 		for _, entry in ipairs(buffer) do
-			print(string.format("  %s | %s | %s",
+			Log:Debug(string.format("  %s | %s | %s",
 				os.date("%Y-%m-%d %H:%M:%S", entry.ts),
 				entry.event,
 				HttpService:JSONEncode(entry.props or {})

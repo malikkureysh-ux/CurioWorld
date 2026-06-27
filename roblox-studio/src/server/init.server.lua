@@ -1,36 +1,65 @@
 --!strict
 --[[
-	init.server.lua — Server-Bootstrap
+	init.server.lua — Server Bootstrap
 	==================================
 
-	Lädt alle Services in der richtigen Reihenfolge:
-	1. TelemetryService — zuerst, damit alle anderen tracken können
-	2. SaveService — vor allem, was Persistenz braucht
-	3. EconomyService — nutzt SaveService + TelemetryService
-	4. (weitere Services in Phase 3)
+	Bootstraps the server-side services in dependency order:
+	1. Log + ServiceRegistry + MapBuilder — utility infrastructure
+	2. TelemetryService — first, so other services can track
+	3. SaveService — before everything that persists data
+	4. EconomyService — depends on Save + Telemetry
+	5. (Phase 3+ services register here)
+
+	Map-Building:
+	- Liest hamburg_harbor_map.lua und baut die Hierarchie im Workspace.
+	- Validierung läuft zuerst; bei Fehlern wird der Build abgebrochen.
 ]]
 
--- Telemetry & Save zuerst
-local TelemetryService = require(script.Parent.Services.TelemetryService)
-local SaveService       = require(script.Parent.Services.SaveService)
+local ServerScriptService = game:GetService("ServerScriptService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
 
--- EconomyService benötigt beide oben
-local EconomyService    = require(script.Parent.Services.EconomyService)
+-- Utilities
+local Log = require(ReplicatedStorage.Shared.Util.Log)
+local ServiceRegistry = require(ReplicatedStorage.Shared.Util.ServiceRegistry)
+local MapBuilder = require(ReplicatedStorage.Shared.Modules.MapBuilder)
 
--- Globale Registry (Phase 3: durch Knit/ECS ersetzen)
-local Services = script.Parent.Parent:FindFirstChild("Services") or Instance.new("Folder")
-Services.Name = "Services"
-Services.Parent = script.Parent
+-- Map data
+local HamburgHarborData = require(ReplicatedStorage.Shared.Data.hamburg_harbor_map)
 
-_G.CurioWorld = {
-	Services = {
-		Economy    = EconomyService,
-		Save       = SaveService,
-		Telemetry  = TelemetryService,
-	},
-}
-
--- Dev-Logging
-if _G.CURIO_WORLD_DEBUG then
-	print("[CurioWorld] Server gestartet. Services:", _G.CurioWorld.Services)
+-- In Studio, enable Debug logging for visible feedback
+if game:GetService("RunService"):IsStudio() then
+	Log:SetLevel("Debug")
 end
+
+-- Validate map data BEFORE building
+local valid, errors = MapBuilder:Validate(HamburgHarborData)
+if not valid then
+	Log:Error("Map validation failed:")
+	for _, err in ipairs(errors) do
+		Log:Error("  - " .. err)
+	end
+	error("Map data invalid — see logs above")
+end
+
+-- Build Hamburg Harbor map into Workspace
+local harborContainer = Workspace:FindFirstChild("Districts")
+	and Workspace.Districts:FindFirstChild("HamburgHarbor")
+
+if harborContainer then
+	MapBuilder:BuildInto(HamburgHarborData, harborContainer)
+else
+	Log:Warn("Workspace.Districts.HamburgHarbor not found — skipping map build")
+end
+
+-- Domain services (require in dependency order)
+local TelemetryService = require(ServerScriptService.Services.TelemetryService)
+local SaveService       = require(ServerScriptService.Services.SaveService)
+local EconomyService    = require(ServerScriptService.Services.EconomyService)
+
+-- Register all services
+ServiceRegistry:Register("Telemetry", TelemetryService)
+ServiceRegistry:Register("Save", SaveService)
+ServiceRegistry:Register("Economy", EconomyService)
+
+Log:Info("Server started. Services registered:", ServiceRegistry:List())

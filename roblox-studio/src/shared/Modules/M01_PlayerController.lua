@@ -40,8 +40,9 @@ function M01_PlayerController:ApplyContext(character: Model, context: MovementCo
 end
 
 -- Kran-Schwingen für Hamburg Harbor (D-014 Highlight)
-function M01_PlayerController:TrySwingFromCrane(character: Model, crane: Model): boolean
+function M01_PlayerController:TrySwingFromCrane(_character: Model, _crane: Model): boolean
 	-- TODO Phase 3: Physik-Simulation, Seil-Snap, Schwung-Phase
+	-- Selene: parameters prefixed with _ to acknowledge future use
 	return false
 end
 

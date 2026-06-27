@@ -121,9 +121,12 @@ end
 
 -- Compliance-Check: verhindert versehentliches Pay-to-Win
 function M07_Economy.AuditItem(item: ShopItem): (boolean, string?)
-	local allowed = false
+	local 	allowed = false
 	for _, c in ipairs(M07_Economy.AllowedCategories) do
-		if c == item.Category then allowed = true; break end
+		if c == item.Category then
+			allowed = true
+			break
+		end
 	end
 	if not allowed then
 		return false, "category_not_allowed: " .. tostring(item.Category)

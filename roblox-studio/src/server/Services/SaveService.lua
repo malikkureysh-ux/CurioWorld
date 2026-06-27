@@ -14,11 +14,22 @@
 	Falls nicht installiert: einfache DataStoreService-Implementierung als Fallback.
 ]]
 
-local Players = game:GetService("Players")
 local DataStoreService = game:GetService("DataStoreService")
-local RunService = game:GetService("RunService")
 
 local SaveService = {}
+
+-- ============================================================
+-- Wallet-Typ (Spiegel von M07_Economy.Wallet, hier dupliziert,
+-- damit SaveService keine Modul-Abhängigkeit hat)
+-- ============================================================
+
+export type Wallet = {
+	Gold: number,
+	Gems: number,
+	RobuxSpent: number,
+	VIPActive: boolean,
+	VIPExpiresAt: number,
+}
 
 -- ============================================================
 -- Konfiguration
@@ -63,7 +74,7 @@ end
 -- Wallet
 -- ============================================================
 
-function SaveService:LoadWallet(player: Player, callback: (M07_Economy.Wallet?) -> ())
+function SaveService:LoadWallet(player: Player, callback: (Wallet?) -> ())
 	if not saveStore then
 		callback(nil)
 		return
@@ -85,7 +96,7 @@ function SaveService:LoadWallet(player: Player, callback: (M07_Economy.Wallet?) 
 		return
 	end
 
-	local wallet: M07_Economy.Wallet = {
+	local wallet: Wallet = {
 		Gold = data.gold or 0,
 		Gems = data.gems or 0,
 		RobuxSpent = data.robux_spent or 0,
@@ -96,7 +107,7 @@ function SaveService:LoadWallet(player: Player, callback: (M07_Economy.Wallet?) 
 	callback(wallet)
 end
 
-function SaveService:SaveWallet(player: Player, wallet: M07_Economy.Wallet): boolean
+function SaveService:SaveWallet(player: Player, wallet: Wallet): boolean
 	if not saveStore then return false end
 
 	local key = SAVE_KEY_PREFIX .. tostring(player.UserId)

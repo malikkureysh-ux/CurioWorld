@@ -133,8 +133,9 @@ end
 -- Lifecycle
 -- ============================================================
 
+local localizationSelf = M15_Localization
 Players.PlayerAdded:Connect(function(player)
-	playerLanguages[player] = self:GuessFromLocale(player)
+	playerLanguages[player] = localizationSelf:GuessFromLocale(player)
 end)
 
 Players.PlayerRemoving:Connect(function(player)

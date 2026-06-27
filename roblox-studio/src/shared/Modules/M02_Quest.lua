@@ -55,6 +55,10 @@ export type QuestProgress = {
 -- ============================================================
 
 M02_Quest.SampleQuests = {
+	-- ============================================================
+	-- HH_01: Kran-Intro (Einstiegsquest, alle Altersbänder)
+	-- Lernziele: Hebelgesetz (Physik), Mengenpriorisierung (Mathe)
+	-- ============================================================
 	["HH_01_kran_intro"] = {
 		id = "HH_01_kran_intro",
 		title_key = "quest.hh_01.title",
@@ -84,10 +88,107 @@ M02_Quest.SampleQuests = {
 		prerequisites = {},
 		rewards = {
 			{ type = "Gold", amount = 50 },
-			{ type = "XP", amount = 100 },
+			{ type = "Gems", amount = 5 },
+			{ type = "Companion", item = "Curio_Seagull" },
 		},
 		age_band_target = "all",
 		adaptive_range = { min = 0.3, max = 0.7 },
+	},
+
+	-- ============================================================
+	-- HH_02: Kran-First-Lift (Vertiefung, höhere Schwierigkeit)
+	-- Lernziele: Koordinaten (Math), Material-Logistik (Planung)
+	-- ============================================================
+	["HH_02_crane_firstlift"] = {
+		id = "HH_02_crane_firstlift",
+		title_key = "quest.hh_02.title",
+		description_key = "quest.hh_02.description",
+		type = "solo",
+		district = "HamburgHarbor",
+		steps = {
+			{
+				id = "step_1_choose_crane",
+				type = "puzzle",
+				target = "CraneSelector",
+				completion_condition = function(_, _) return true end,
+			},
+			{
+				id = "step_2_load_container",
+				type = "objective",
+				target = "PickUpContainer",
+				completion_condition = function(_, _) return true end,
+			},
+			{
+				id = "step_3_navigate_to_dropzone",
+				type = "objective",
+				target = "DropZoneA",
+				completion_condition = function(_, _) return true end,
+			},
+			{
+				id = "step_4_release",
+				type = "puzzle",
+				target = "ReleaseContainer",
+				completion_condition = function(_, _) return true end,
+			},
+		},
+		prerequisites = { "HH_01_kran_intro" },
+		rewards = {
+			{ type = "Gold", amount = 120 },
+			{ type = "Gems", amount = 12 },
+			{ type = "Companion_Skin", item = "Curio_Seagull_Golden" },
+		},
+		age_band_target = "12-13",
+		adaptive_range = { min = 0.4, max = 0.8 },
+	},
+
+	-- ============================================================
+	-- HH_03: Werft-Bootsbau (Teamwork-Quest)
+	-- Lernziele: Team-Koordination, Werkzeug-Reihenfolge (Planung)
+	-- ============================================================
+	["HH_03_werft_boat"] = {
+		id = "HH_03_werft_boat",
+		title_key = "quest.hh_03.title",
+		description_key = "quest.hh_03.description",
+		type = "team",
+		district = "HamburgHarbor",
+		min_team_size = 2,
+		max_team_size = 4,
+		steps = {
+			{
+				id = "step_1_gather_materials",
+				type = "collect",
+				target = "Materials",
+				required_count = 4,
+				completion_condition = function(_, _) return true end,
+			},
+			{
+				id = "step_2_assemble_hull",
+				type = "build",
+				target = "BoatHull",
+				completion_condition = function(_, _) return true end,
+			},
+			{
+				id = "step_3_fit_sails",
+				type = "build",
+				target = "BoatSails",
+				completion_condition = function(_, _) return true end,
+			},
+			{
+				id = "step_4_launch",
+				type = "objective",
+				target = "LaunchBoat",
+				completion_condition = function(_, _) return true end,
+			},
+		},
+		prerequisites = { "HH_01_kran_intro" },
+		rewards = {
+			{ type = "Gold", amount = 200 },
+			{ type = "Gems", amount = 25 },
+			{ type = "Companion", item = "Curio_PaperBoat" },
+			{ type = "Photo_Filter", item = "Maritime" },
+		},
+		age_band_target = "all",
+		adaptive_range = { min = 0.3, max = 0.9 },
 	},
 }
 
