@@ -71,6 +71,13 @@ task.spawn(setupHud)
 QuestDetailController:Init(Players.LocalPlayer)
 SoundController:Init()
 
+-- DailyQuests Client: zeigt Daily-Quest-Modal bei Remote-Trigger
+pcall(function()
+	local DailyQuestsClient = require(
+		script.Parent.Controllers.DailyQuestsClient)
+	DailyQuestsClient:Init(Players.LocalPlayer)
+end)
+
 -- M20.Shop braucht SoundController-Referenz (für Kauf-Sound)
 pcall(function()
 	local M20_Shop = require(ReplicatedStorage.Shared.Modules.M20_Shop)

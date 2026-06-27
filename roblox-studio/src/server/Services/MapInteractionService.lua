@@ -23,6 +23,20 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Log = require(ReplicatedStorage.Shared.Util.Log)
 local ServiceRegistry = require(ReplicatedStorage.Shared.Util.ServiceRegistry)
 
+-- DailyQuestService (lazy load)
+local DailyQuestService = nil
+local function getDailyQuestService()
+	if not DailyQuestService then
+		local ok, svc = pcall(function()
+			return require(ServerScriptService.Services.DailyQuestService)
+		end)
+		if ok and svc then
+			DailyQuestService = svc
+		end
+	end
+	return DailyQuestService
+end
+
 local MapInteractionService = {}
 
 -- ============================================================
@@ -81,7 +95,14 @@ local function handleInteraction(player: Player, prompt: ProximityPrompt)
 	elseif interactType == "QuestBoard" then
 		-- Tagesaufgaben anzeigen
 		Log:Info(("[MapInteraction] Opening daily quests for %s"):format(player.Name))
-		remoteShowDailyQuests:FireClient(player)
+		local dailyQuestSvc = getDailyQuestService()
+		if dailyQuestSvc then
+			local quests = dailyQuestSvc:GetTodaysQuests(player)
+			remoteShowDailyQuests:FireClient(player, quests)
+		else
+			-- Fallback: leeres Modal
+			remoteShowDailyQuests:FireClient(player, {})
+		end
 	elseif interactType == "NPC" then
 		-- NPC-ProximityPrompt wird bereits von M16 gehandhabt — no-op
 		Log:Debug("[MapInteraction] NPC prompt handled by M16")

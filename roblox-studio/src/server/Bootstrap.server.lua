@@ -65,6 +65,7 @@ local QuestService      = require(ServerScriptService.Services.QuestService)
 local QuestVisibilityService = require(ServerScriptService.Services.QuestVisibilityService)
 local M14_Parental      = require(ServerScriptService.Services.M14_Parental)
 local MapInteractionService = require(ServerScriptService.Services.MapInteractionService)
+local DailyQuestService = require(ServerScriptService.Services.DailyQuestService)
 
 ServiceRegistry:Register("Telemetry", TelemetryService)
 ServiceRegistry:Register("Save", SaveService)
@@ -73,6 +74,7 @@ ServiceRegistry:Register("Quest", QuestService)
 ServiceRegistry:Register("QuestVisibility", QuestVisibilityService)
 ServiceRegistry:Register("Parental", M14_Parental)
 ServiceRegistry:Register("MapInteraction", MapInteractionService)
+ServiceRegistry:Register("DailyQuest", DailyQuestService)
 
 -- M08 Accessibility (client+server shared) — init hook
 pcall(function()
