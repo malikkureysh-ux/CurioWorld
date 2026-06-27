@@ -82,6 +82,8 @@ local HamburgHarbor = {
 		-- ============================================================
 		{
 			Name = "CraneArea",
+			ClassName = "Model",
+			Properties = {},
 			Children = {
 				{
 					Name = "CraneA",
