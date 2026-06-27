@@ -7,16 +7,16 @@
       "Shared": {
         "$className": "Folder",
         "Modules": {
-          "$folder": "src/shared/Modules"
+          "$path": "src/shared/Modules"
         },
         "Data": {
-          "$folder": "src/shared/Data"
+          "$path": "src/shared/Data"
         },
         "Util": {
-          "$folder": "src/shared/Util"
+          "$path": "src/shared/Util"
         },
         "Tests": {
-          "$folder": "src/tests"
+          "$path": "src/tests"
         }
       },
       "Locale": {
@@ -26,10 +26,10 @@
     "ServerScriptService": {
       "$className": "ServerScriptService",
       "Services": {
-        "$folder": "src/server/Services"
+        "$path": "src/server/Services"
       },
-      "init.server.lua": {
-        "$path": "src/server/init.server.lua"
+      "Bootstrap": {
+        "$path": "src/server/Bootstrap.server.lua"
       },
       "TestRunner": {
         "$path": "src/server/TestRunner.server.lua"
@@ -40,10 +40,10 @@
       "StarterPlayerScripts": {
         "$className": "StarterPlayerScripts",
         "Controllers": {
-          "$folder": "src/client/Controllers"
+          "$path": "src/client/Controllers"
         },
-        "init.client.lua": {
-          "$path": "src/client/init.client.lua"
+        "Bootstrap": {
+          "$path": "src/client/Bootstrap.client.lua"
         }
       }
     },
