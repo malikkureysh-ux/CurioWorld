@@ -20,7 +20,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local TestEZ
-local ok, err = pcall(function()
+local ok = pcall(function()
 	-- TestEZ exposes itself as a global when loaded as a side effect
 	TestEZ = require(ReplicatedStorage.Packages.TestEZ)
 end)
@@ -42,7 +42,8 @@ local testFolder = ReplicatedStorage:FindFirstChild("Shared")
 local specs = {}
 if testFolder then
 	for _, child in ipairs(testFolder:GetChildren()) do
-		if child:IsA("ModuleScript") and string.match(child.Name, "%.spec$") then
+		-- Match *.spec.lua and *.spec (so both work)
+		if child:IsA("ModuleScript") and string.match(child.Name, "%.spec") then
 			table.insert(specs, child)
 		end
 	end
