@@ -103,6 +103,30 @@ local HamburgHarbor = {
 				BrickColor = BrickColor.new("Bright blue"),
 				Transparency = 0.3,  -- leicht durchsichtig für Tiefenwirkung
 			},
+			Children = {
+				{
+					Name = "WaterMist",
+					ClassName = "ParticleEmitter",
+					Properties = {
+						Texture = "rbxassetid://6490035152",  -- Standard-Roblox-Smoke
+						Color = ColorSequence.new(Color3.fromRGB(180, 200, 220)),
+						Transparency = NumberSequence.new({
+							NumberSequenceKeypoint.new(0, 0.6),
+							NumberSequenceKeypoint.new(1, 1),
+						}),
+						Size = NumberSequence.new({
+							NumberSequenceKeypoint.new(0, 0.5),
+							NumberSequenceKeypoint.new(1, 2.0),
+						}),
+						Lifetime = NumberRange.new(3, 5),
+						Rate = 8,
+						Speed = NumberRange.new(0.5, 1.5),
+						SpreadAngle = Vector2.new(15, 15),
+						Enabled = true,
+					},
+					Attributes = { VfxType = "WaterMist" },
+				},
+			},
 		},
 
 		-- ============================================================
@@ -456,9 +480,44 @@ local HamburgHarbor = {
 					  MeshId = "rbxassetid://PENDING_UPLOAD_laterne_lod0",
 					  Size = Vector3.new(0.5, 3.5, 0.5),
 					  Position = Vector3.new(-25, 1.75, 30),
+				  },
+				  Children = {
+					  {
+						  Name = "LanternGlow",
+						  ClassName = "PointLight",
+						  Properties = {
+							  Color = Color3.fromRGB(255, 220, 110),
+							  Brightness = 1.5,
+							  Range = 18,
+							  Enabled = true,
+							  ShadowsEnabled = true,
+						  },
+						  Attributes = { VfxType = "LanternGlow" },
+					  },
+					  {
+						  Name = "LanternDust",
+						  ClassName = "ParticleEmitter",
+						  Properties = {
+							  Texture = "rbxassetid://6490035152",
+							  Color = ColorSequence.new(Color3.fromRGB(255, 220, 110)),
+							  Transparency = NumberSequence.new({
+								  NumberSequenceKeypoint.new(0, 0.4),
+								  NumberSequenceKeypoint.new(1, 1),
+							  }),
+							  Size = NumberSequence.new({
+								  NumberSequenceKeypoint.new(0, 0.2),
+								  NumberSequenceKeypoint.new(1, 1.2),
+							  }),
+							  Lifetime = NumberRange.new(2, 4),
+							  Rate = 3,
+							  Speed = NumberRange.new(0.3, 1.0),
+							  SpreadAngle = Vector2.new(20, 20),
+							  EmissionDirection = Enum.NormalId.Top,
+							  Enabled = true,
+						  },
+						  Attributes = { VfxType = "LanternDust" },
+					  },
 				  }},
-			},
-		},
 	},
 }
 

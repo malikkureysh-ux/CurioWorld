@@ -61,6 +61,57 @@
         "RespectFilteringEnabled": true,
         "RolloffScale": 1.0,
         "DopplerScale": 1.0
+      },
+      "Ambient_Hafen": {
+        "$className": "Sound",
+        "$properties": {
+          "SoundId": "rbxassetid://PENDING_UPLOAD_ambient_hafen",
+          "Volume": 0.3,
+          "Looped": true,
+          "PlaybackSpeed": 1.0,
+          "RollOffMode": "Linear",
+          "RollOffMaxDistance": 200
+        }
+      },
+      "Kran_Mechanik": {
+        "$className": "Sound",
+        "$properties": {
+          "SoundId": "rbxassetid://PENDING_UPLOAD_kran_mechanik",
+          "Volume": 0.7,
+          "Looped": false
+        }
+      },
+      "Wasserplätschern": {
+        "$className": "Sound",
+        "$properties": {
+          "SoundId": "rbxassetid://PENDING_UPLOAD_wasserplatschern",
+          "Volume": 0.4,
+          "Looped": true
+        }
+      },
+      "Moewen_Abend": {
+        "$className": "Sound",
+        "$properties": {
+          "SoundId": "rbxassetid://PENDING_UPLOAD_moewen_abend",
+          "Volume": 0.25,
+          "Looped": true
+        }
+      },
+      "UI_Click": {
+        "$className": "Sound",
+        "$properties": {
+          "SoundId": "rbxassetid://PENDING_UPLOAD_ui_click",
+          "Volume": 0.5,
+          "Looped": false
+        }
+      },
+      "Quest_Abschluss": {
+        "$className": "Sound",
+        "$properties": {
+          "SoundId": "rbxassetid://PENDING_UPLOAD_quest_abschluss",
+          "Volume": 0.6,
+          "Looped": false
+        }
       }
     },
     "ReplicatedStorage": {
