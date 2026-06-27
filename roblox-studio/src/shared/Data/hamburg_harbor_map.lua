@@ -507,7 +507,7 @@ local HamburgHarbor = {
 							  Size = NumberSequence.new({
 								  NumberSequenceKeypoint.new(0, 0.2),
 								  NumberSequenceKeypoint.new(1, 1.2),
-							  }),
+								}),
 							  Lifetime = NumberRange.new(2, 4),
 							  Rate = 3,
 							  Speed = NumberRange.new(0.3, 1.0),
@@ -518,7 +518,10 @@ local HamburgHarbor = {
 						  Attributes = { VfxType = "LanternDust" },
 					  },
 				  },
+				},
+			},
 		},
+	},
 }
 
 return HamburgHarbor
