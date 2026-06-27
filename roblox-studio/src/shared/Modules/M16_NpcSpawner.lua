@@ -194,6 +194,40 @@ local function attachProximityPrompt(model: Model, npcId: string)
 	prompt.MaxActivationDistance = 8
 	prompt.RequiresLineOfSight = true
 	prompt.Parent = primary
+
+	-- Wire up: bei Trigger → M18 Dialogue UI öffnen
+	prompt.Triggered:Connect(function(playerWhoTriggered)
+		local config = M16_NpcSpawner.NpcConfig[npcId]
+		if not config then return end
+
+		-- Versuche M18 Dialogue zu laden (kann fehlen in Phase 2 wenn UI noch nicht verkabelt)
+		local ok, M18 = pcall(function()
+			return require(ReplicatedStorage.Shared.Modules.M18_Dialogue)
+		end)
+		if not ok or not M18 then
+			Log:Warn("[M16] M18_Dialogue nicht verfügbar — ProximityPrompt ohne UI-Verkabelung")
+			return
+		end
+
+		-- Lokalisierter Greeting-Text
+		local greetingKey = config.DialogueKey
+		local greetingText = greetingKey  -- Fallback = key selbst
+		pcall(function()
+			local M15 = require(ReplicatedStorage.Shared.Modules.M15_Localization)
+			greetingText = M15:T(greetingKey) or greetingKey
+		end)
+
+		-- Dialogue öffnen
+		M18:Show(playerWhoTriggered, config, greetingText)
+		Log:Info(("[M16] Dialogue geöffnet für %s mit %s"):format(playerWhoTriggered.Name, npcId))
+
+		-- Sound-Feedback (NPC-Greeting falls vorhanden)
+		pcall(function()
+			local soundService = game:GetService("SoundService")
+			local ambient = soundService:FindFirstChild("Kran_Mechanik")
+			-- (Wir haben aktuell keinen NPC-Specific-Sound; Kran_Mechanik als Fallback)
+		end)
+	end)
 end
 
 -- ============================================================

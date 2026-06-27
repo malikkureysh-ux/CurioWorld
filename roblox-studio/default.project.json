@@ -114,6 +114,36 @@
         }
       }
     },
+    "AssetDefinitions": {
+      "$className": "Folder",
+      "Animations": {
+        "$className": "Folder",
+        "NPC_Idle_Wave": {
+          "$className": "Animation",
+          "$properties": {
+            "AnimationId": "rbxassetid://PENDING_UPLOAD_npc_idle_wave"
+          }
+        },
+        "NPC_Idle_Look": {
+          "$className": "Animation",
+          "$properties": {
+            "AnimationId": "rbxassetid://PENDING_UPLOAD_npc_idle_look"
+          }
+        },
+        "Kran_Swing": {
+          "$className": "Animation",
+          "$properties": {
+            "AnimationId": "rbxassetid://PENDING_UPLOAD_kran_swing"
+          }
+        },
+        "Boat_Row": {
+          "$className": "Animation",
+          "$properties": {
+            "AnimationId": "rbxassetid://PENDING_UPLOAD_boat_row"
+          }
+        }
+      }
+    },
     "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
       "Shared": {
