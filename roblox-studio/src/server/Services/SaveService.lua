@@ -178,11 +178,11 @@ function SaveService:SaveSetting(player: Player, key: string, value: any): boole
 	local ok2, data = pcall(function()
 		return saveStore:GetAsync(storeKey)
 	end)
-	local settings = (ok2 and typeof(data) == "table") and data or {}
+	local settings: any = (ok2 and typeof(data) == "table") and data or {}
 
-	(settings :: any)[key] = value
-	(settings :: any).saved_at = os.time()
-	(settings :: any).version = SAVE_VERSION
+	settings[key] = value
+	settings.saved_at = os.time()
+	settings.version = SAVE_VERSION
 
 	local ok3, err3 = pcall(function()
 		saveStore:SetAsync(storeKey, settings)

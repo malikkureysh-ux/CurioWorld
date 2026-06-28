@@ -125,10 +125,10 @@ M13_Moderation.SafePhrases = {
 -- ============================================================
 
 export type BlockedWord = string
-M13_Moderation.BlockedWords: { BlockedWord } = {
+M13_Moderation.BlockedWords = ({
 	-- Conservative: beleidigende + diskriminierende Begriffe
 	-- (Phase 3: vollständige Liste mit Locales)
 	"idiot", "dumm", "noob", "hate", "kill yourself",
-}
+} :: { BlockedWord })
 
 return M13_Moderation

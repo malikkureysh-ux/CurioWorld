@@ -151,10 +151,11 @@ return function()
 
 		it("should have stricter limits for younger bands", function()
 			-- Length: 9-11 < 12-13 < 14-16
-			expect(M13.PermissionsForBand["9-11"].MaxMessageLength)
-				< M13.PermissionsForBand["12-13"].MaxMessageLength
-			expect(M13.PermissionsForBand["12-13"].MaxMessageLength)
-				< M13.PermissionsForBand["14-16"].MaxMessageLength
+			local len9 = M13.PermissionsForBand["9-11"].MaxMessageLength
+			local len12 = M13.PermissionsForBand["12-13"].MaxMessageLength
+			local len14 = M13.PermissionsForBand["14-16"].MaxMessageLength
+			expect(len9 < len12).to.equal(true)
+			expect(len12 < len14).to.equal(true)
 		end)
 
 		it("should not allow free text for 9-11", function()

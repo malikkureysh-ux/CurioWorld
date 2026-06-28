@@ -158,7 +158,7 @@ function M06_Inventory:Remove(player: any, itemId: string, count: number?): bool
 	local pid = self:ToPid(player)
 	if not pid then return false end
 
-	local inventory = getInventory[pid] or getInventory(pid)
+	local inventory = inventories[pid] or getInventory(pid)
 	if not inventory then return false end
 
 	-- Iteriere rückwärts um Stacks sauber zu löschen

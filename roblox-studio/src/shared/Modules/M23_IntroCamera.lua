@@ -97,16 +97,21 @@ function M23_IntroCamera:Play(player: Player)
 		Log:Info(("[M23] Intro complete für %s"):format(player.Name))
 	end)
 
-	-- Skip via Click
+	-- Skip via Click (touch/mouse) — uses UserInputService for cross-platform support
 	if M23_IntroCamera.Config.Skippable then
+		local UserInputService = game:GetService("UserInputService")
 		local conn
-		conn = player:GetMouse().Button1Down:Connect(function()
-			for _, tween in ipairs(tweenInfos) do
-				tween:Cancel()
+		conn = UserInputService.InputBegan:Connect(function(input, _gameProcessed)
+			if input.UserInputType == Enum.UserInputType.MouseButton1
+				or input.UserInputType == Enum.UserInputType.Touch
+				or input.UserInputType == Enum.UserInputType.Keyboard then
+				for _, tween in ipairs(tweenInfos) do
+					tween:Cancel()
+				end
+				camera.CameraType = originalType
+				conn:Disconnect()
+				Log:Info(("[M23] Intro skipped für %s"):format(player.Name))
 			end
-			camera.CameraType = originalType
-			conn:Disconnect()
-			Log:Info(("[M23] Intro skipped für %s"):format(player.Name))
 		end)
 	end
 

@@ -160,6 +160,7 @@ DailyQuestService.Pool = {
 -- ============================================================
 
 local playerDailyQuests: { [string]: { date: string, quests: { any } } } = {}
+local claimedDailyQuests: { [string]: { [string]: boolean } } = {}
 
 local function todayUtcKey(): string
 	return os.date("!%Y-%m-%d")  -- UTC
@@ -278,8 +279,6 @@ function DailyQuestService:ClaimDailyQuest(player: Player, dailyQuestId: string)
 	local ServiceRegistry = require(ReplicatedStorage.Shared.Util.ServiceRegistry)
 	local questService = ServiceRegistry:Get("Quest")
 	if questService then
-		-- Daily-Quests nutzen den NPC-Namen oder Zone-Namen als Quest-ID
-		local quest = todays[1]  -- Already validated above
 		for _, q in ipairs(todays) do
 			if q.id == dailyQuestId then
 				-- Starte eine passende Main-Quest basierend auf Daily-Quest-Typ
@@ -304,6 +303,19 @@ function DailyQuestService:IsDailyQuestClaimed(player: Player, dailyQuestId: str
 end
 
 -- Wire RemoteFunction handler
+-- (Remote muss VOR dem OnServerInvoke erzeugt werden)
+local claimRemotesFolder = ReplicatedStorage:FindFirstChild("MapInteractionRemotes")
+if not claimRemotesFolder then
+	claimRemotesFolder = Instance.new("Folder")
+	claimRemotesFolder.Name = "MapInteractionRemotes"
+	claimRemotesFolder.Parent = ReplicatedStorage
+end
+local remoteClaimDailyQuest = claimRemotesFolder:FindFirstChild("ClaimDailyQuest")
+if not remoteClaimDailyQuest then
+	remoteClaimDailyQuest = Instance.new("RemoteFunction")
+	remoteClaimDailyQuest.Name = "ClaimDailyQuest"
+	remoteClaimDailyQuest.Parent = claimRemotesFolder
+end
 remoteClaimDailyQuest.OnServerInvoke = function(player, dailyQuestId)
 	return DailyQuestService:ClaimDailyQuest(player, dailyQuestId)
 end

@@ -90,7 +90,9 @@ M16_NpcSpawner:RegisterService()
 if harborContainer then
 	local spawnedNpcs = M16_NpcSpawner:SpawnAll(Workspace.Districts)
 	local count = 0
-	for _ in pairs(spawnedNpcs) do count += 1 end
+	for _ in pairs(spawnedNpcs) do
+		count += 1
+	end
 	Log:Info(("NPCs gespawnt: %d"):format(count))
 end
 
@@ -229,7 +231,7 @@ local function onPlayerAdded(player: Player)
 	end)
 
 	-- Sound: Auto-Play Ambient wenn Studio / Test-Server läuft
-	spawn(function()
+	task.spawn(function()
 		if game:GetService("RunService"):IsStudio() then
 			local ambient = SoundService:FindFirstChild("Ambient_Hafen")
 			if ambient and ambient:IsA("Sound") then

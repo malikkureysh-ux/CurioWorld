@@ -139,11 +139,14 @@ local function makeSlider(parent, label, initialValue, callback, ownerCleanup)
 	track.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1
 			or input.UserInputType == Enum.UserInputType.Touch then
-			local mouse = Players.LocalPlayer:GetMouse()
+			-- Cross-platform: Use UserInputService for mouse-position-update
+			-- (Players.LocalPlayer:GetMouse() is deprecated and doesn't work on mobile)
+			local UserInputService = game:GetService("UserInputService")
+			local currentMousePos = UserInputService:GetMouseLocation()
 			local updateValue
 			updateValue = function()
 				local relX = math.clamp(
-					(mouse.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
+					(currentMousePos.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
 				TweenService:Create(fill, TweenInfo.new(0.1),
 					{ Size = UDim2.new(relX, 0, 1, 0) }):Play()
 				TweenService:Create(knob, TweenInfo.new(0.1),
@@ -153,13 +156,22 @@ local function makeSlider(parent, label, initialValue, callback, ownerCleanup)
 			end
 			updateValue()
 			-- Move-Listener: tracked, disconnectet bei InputEnded oder Cleanup
-			local moveConn = mouse.Move:Connect(function() updateValue() end)
+			local moveConn = UserInputService.InputChanged:Connect(function(changedInput)
+				if changedInput.UserInputType == Enum.UserInputType.MouseMovement
+					or changedInput.UserInputType == Enum.UserInputType.Touch then
+					currentMousePos = UserInputService:GetMouseLocation()
+					updateValue()
+				end
+			end)
 			table.insert(connections, moveConn)
 
 			local releaseConn
-			releaseConn = mouse.Button1Up:Connect(function()
-				if moveConn and moveConn.Connected then moveConn:Disconnect() end
-				if releaseConn and releaseConn.Connected then releaseConn:Disconnect() end
+			releaseConn = UserInputService.InputEnded:Connect(function(endedInput)
+				if endedInput.UserInputType == Enum.UserInputType.MouseButton1
+					or endedInput.UserInputType == Enum.UserInputType.Touch then
+					if moveConn and moveConn.Connected then moveConn:Disconnect() end
+					if releaseConn and releaseConn.Connected then releaseConn:Disconnect() end
+				end
 			end)
 			table.insert(connections, releaseConn)
 		end
